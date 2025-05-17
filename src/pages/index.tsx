@@ -1,3 +1,7 @@
-export default function Home() {
-  return <div className="min-h-[100dvh]"></div>;
+import AdminDashboard from "@/components/AdminDashboard";
+
+function App() {
+  return <AdminDashboard />;
 }
+
+export default App;
