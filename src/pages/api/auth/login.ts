@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { compare } from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import conn from '@/lib/postgre';
+import createClient from '@/lib/postgre';
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,6 +10,8 @@ export default async function handler(
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Метод не разрешен' });
   }
+
+  const supabase = createClient(req, res)
 
   try {
     const { phone_number, password } = req.body;
@@ -23,17 +25,17 @@ export default async function handler(
     }
 
     // Поиск пользователя в базе данных
-    const userResult = await conn`
-      SELECT *
-      FROM users 
-      WHERE phone_number = ${phone_number}
-    `;
-    
-    if (userResult.length === 0) {
+    const { data: userResult, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('phone_number', phone_number)
+      .single();
+
+    if (error || !userResult) {
       return res.status(401).json({ error: 'Неверный номер телефона или пароль' });
     }
 
-    const user = userResult[0];
+    const user = userResult;
 
     // Проверка пароля
     const isPasswordValid = await compare(password, user.password_hash);
@@ -62,7 +64,7 @@ export default async function handler(
       user: { id: user.id, phone_number: user.phone_number, role: user.role },
     });
   } catch (error) {
-    console.log('Ошибка входа:', error);
+    console.error('Ошибка входа:', error);
     return res.status(500).json({ error: 'Внутренняя ошибка сервера' });
   }
 }
