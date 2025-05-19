@@ -1,13 +1,31 @@
 import { useState } from 'react';
 import { Eye, EyeClosed } from 'phosphor-react';
-import { useRouter } from 'next/router';
 import { toast } from 'react-toastify';
+import { useUser } from '@/hooks/useUser';
+import { GetServerSidePropsContext } from 'next';
+
+export const getServerSideProps = (context: GetServerSidePropsContext) => {
+  const authToken = context.req.cookies.authToken;
+
+  if (authToken) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: true,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+};
 
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const router = useRouter();
+  const { login } = useUser();
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
@@ -31,7 +49,12 @@ const Login = () => {
         return;
       }
 
-      router.push('/');
+      if (data.user.role !== 'admin') {
+        toast.error('Вы не являетесь администратором');
+        return;
+      }
+
+      login(data.user);
     } catch (err) {
       console.error(err);
     }

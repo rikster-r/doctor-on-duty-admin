@@ -11,7 +11,7 @@ export default async function handler(
     return res.status(405).json({ error: 'Метод не разрешен' });
   }
 
-  const supabase = createClient(req, res)
+  const supabase = createClient(req, res);
 
   try {
     const { phone_number, password } = req.body;
@@ -32,20 +32,29 @@ export default async function handler(
       .single();
 
     if (error || !userResult) {
-      return res.status(401).json({ error: 'Неверный номер телефона или пароль' });
+      return res
+        .status(401)
+        .json({ error: 'Неверный номер телефона или пароль' });
     }
 
-    const user = userResult;
+    const user = userResult as User;
 
     // Проверка пароля
     const isPasswordValid = await compare(password, user.password_hash);
     if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Неверный номер телефона или пароль' });
+      return res
+        .status(401)
+        .json({ error: 'Неверный номер телефона или пароль' });
     }
 
     // Генерация JWT токена
     const token = jwt.sign(
-      { userId: user.id, phone_number: user.phone_number, role: user.role },
+      {
+        id: user.id,
+        phone_number: user.phone_number,
+        role: user.role,
+        created_at: user.created_at,
+      },
       process.env.JWT_SECRET!,
       { expiresIn: '7d' }
     );
@@ -61,7 +70,12 @@ export default async function handler(
     // Успешный ответ
     return res.status(200).json({
       message: 'Вход выполнен успешно',
-      user: { id: user.id, phone_number: user.phone_number, role: user.role },
+      user: {
+        id: user.id,
+        phone_number: user.phone_number,
+        role: user.role,
+        created_at: user.created_at,
+      },
     });
   } catch (error) {
     console.error('Ошибка входа:', error);

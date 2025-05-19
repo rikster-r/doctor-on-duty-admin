@@ -11,7 +11,7 @@ export default async function handler(
     return res.status(405).json({ error: 'Метод не разрешен' });
   }
 
-  const supabase = createClient(req, res)
+  const supabase = createClient(req, res);
 
   try {
     const { phone_number, password, role } = req.body;
