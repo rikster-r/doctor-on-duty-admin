@@ -1,5 +1,14 @@
 @import 'tailwindcss';
 
-button {
+button:not(:disabled) {
   @apply hover:cursor-pointer;
+}
+
+body {
+  display: flex;
+  min-height: 100vh;
+}
+
+#__next {
+  flex: 1 1 auto;
 }

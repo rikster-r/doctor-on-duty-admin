@@ -9,7 +9,7 @@ const geist = Geist({
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <div className={geist.className}>
+    <div className={`${geist.className} h-full`}>
       <Component {...pageProps} />
     </div>
   );

@@ -8,6 +8,8 @@ import {
   Trash,
   FirstAid,
 } from 'phosphor-react';
+import { deleteCookie } from 'cookies-next/client';
+import { useRouter } from 'next/router';
 
 const usersSample = [
   {
@@ -34,8 +36,9 @@ const usersSample = [
 ];
 
 export default function AdminDashboard() {
-  const [users, setUsers] = useState(usersSample);
+  const [users] = useState(usersSample);
   const [search, setSearch] = useState('');
+  const router = useRouter();
 
   // Filter users by search
   const filteredUsers = users.filter(
@@ -43,6 +46,11 @@ export default function AdminDashboard() {
       u.name.toLowerCase().includes(search.toLowerCase()) ||
       u.email.toLowerCase().includes(search.toLowerCase())
   );
+
+  const logOut = () => {
+    deleteCookie('authToken');
+    router.push('/login');
+  };
 
   return (
     <div className="flex min-h-screen bg-gradient-to-b from-gray-50 to-blue-50">
@@ -60,7 +68,10 @@ export default function AdminDashboard() {
             <FirstAid size={20} weight="bold" className="text-gray-600" />
             <span className="text-sm text-gray-700">Отделения</span>
           </button>
-          <button className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 transition-colors duration-200">
+          <button
+            className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 transition-colors duration-200"
+            onClick={logOut}
+          >
             <SignOut size={20} weight="bold" className="text-gray-600" />
             <span className="text-sm text-gray-700">Выйти</span>
           </button>
@@ -165,7 +176,7 @@ export default function AdminDashboard() {
                     </td>
                   </tr>
                 ))
-              ) : ( 
+              ) : (
                 <tr>
                   <td
                     colSpan={7}
