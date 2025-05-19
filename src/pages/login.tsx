@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Eye, EyeClosed } from 'phosphor-react';
 import { useRouter } from 'next/router';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -26,12 +27,13 @@ const Login = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Ошибка входа');
+        toast.error(data.error || 'Ошибка входа');
+        return;
       }
 
       router.push('/');
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
   };
 
