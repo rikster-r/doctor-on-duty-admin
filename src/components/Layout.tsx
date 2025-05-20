@@ -19,7 +19,7 @@ const Layout = ({ children, title, description }: Props) => {
         <meta name="description" content={description} />
       </Head>
       <div className="flex flex-col lg:flex-row bg-[#ebf4fd] min-h-screen">
-        <header className="lg:hidden w-full px-6 py-3 flex items-center bg-white text-blue-800 shadow">
+        <header className="lg:hidden w-full px-6 py-3 flex items-center bg-white text-blue-800 shadow sticky top-0 z-40">
           <div className="text-lg font-semibold">Дежурный доктор</div>
           <button className="ml-auto" onClick={openSidebar}>
             <List size={20} />
@@ -42,11 +42,11 @@ const Layout = ({ children, title, description }: Props) => {
           </Dialog>
         </header>
 
-        <div className="hidden lg:block">
+        <div className="hidden lg:block fixed h-full">
           <Sidebar />
         </div>
 
-        <div className="flex w-full justify-center">{children}</div>
+        <div className="flex w-full justify-center lg:ml-72">{children}</div>
       </div>
     </>
   );

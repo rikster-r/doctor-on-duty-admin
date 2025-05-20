@@ -37,7 +37,7 @@ export default function AdminDashboard() {
   const users = useMemo(() => (data ? data.users : []), [data]);
   const userCount = useMemo(() => (data ? data.totalUsers : 0), [data]);
 
-  if (isLoading && users.length === 0) {
+  if (isLoading && !searchQuery) {
     return (
       <Layout
         title="Панель пользователей"

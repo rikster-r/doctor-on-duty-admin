@@ -12,7 +12,7 @@ const geist = Geist({
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <UserProvider>
-      <div className={`${geist.className} h-full`}>
+      <div className={`${geist.className} h-full relative`}>
         <Component {...pageProps} />
         <ToastContainer
           position="top-right"

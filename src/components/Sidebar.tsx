@@ -1,5 +1,6 @@
 import { FirstAid, SignOut, UserCircle } from 'phosphor-react';
 import { useUser } from '@/hooks/useUser';
+import Link from 'next/link';
 
 const Sidebar = () => {
   const { logout } = useUser();
@@ -10,14 +11,20 @@ const Sidebar = () => {
         Дежурный доктор
       </div>
       <nav className="flex flex-col gap-1 px-4 flex-1 font-semibold">
-        <button className="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 transition-colors duration-200 text-white">
+        <Link
+          href="/"
+          className="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 transition-colors duration-200 text-white"
+        >
           <UserCircle size={20} weight="bold" />
           <span className="text-sm">Пользователи</span>
-        </button>
-        <button className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 transition-colors duration-200">
+        </Link>
+        <Link
+          href="/departments"
+          className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 transition-colors duration-200"
+        >
           <FirstAid size={20} weight="bold" className="text-gray-600" />
           <span className="text-sm text-gray-700">Отделения</span>
-        </button>
+        </Link>
         <button
           className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-blue-50 transition-colors duration-200"
           onClick={logout}
