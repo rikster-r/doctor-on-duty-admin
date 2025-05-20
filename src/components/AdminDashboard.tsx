@@ -10,6 +10,7 @@ import Layout from './Layout';
 import { fetcher } from '@/lib/fetcher';
 import useSWR from 'swr';
 import Pagination from './Pagination';
+import { toast } from 'react-toastify';
 
 const pageSize = 50;
 
@@ -23,7 +24,11 @@ type UsersData = {
 export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
-  const { data, isLoading } = useSWR<UsersData>(
+  const {
+    data,
+    mutate: mutateUsers,
+    isLoading,
+  } = useSWR<UsersData>(
     searchQuery
       ? `/api/users?search=${encodeURIComponent(
           searchQuery
@@ -36,6 +41,32 @@ export default function AdminDashboard() {
   );
   const users = useMemo(() => (data ? data.users : []), [data]);
   const userCount = useMemo(() => (data ? data.totalUsers : 0), [data]);
+
+  const deleteUser = async (id: number) => {
+    const res = await fetch(`/api/users/${id}`, {
+      method: 'DELETE',
+    });
+
+    if (!res.ok) {
+      const data = await res.json();
+      toast.error(data.error);
+    } else {
+      toast.success('Пользователь успешно удален');
+      mutateUsers((currentData?: UsersData) => {
+        if (!currentData) return currentData;
+
+        const filteredUsers = currentData.users.filter(
+          (user) => user.id !== id
+        );
+
+        return {
+          ...currentData,
+          users: filteredUsers,
+          totalUsers: currentData.totalUsers - 1,
+        };
+      });
+    }
+  };
 
   if (isLoading && !searchQuery) {
     return (
@@ -179,6 +210,7 @@ export default function AdminDashboard() {
                         <button
                           aria-label="Delete User"
                           className="text-red-500 hover:text-red-700 transition-colors duration-150"
+                          onClick={() => deleteUser(user.id)}
                         >
                           <Trash size={18} weight="bold" />
                         </button>
