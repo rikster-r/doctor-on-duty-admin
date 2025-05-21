@@ -35,7 +35,12 @@ export default async function handler(
     try {
       let query = supabase
         .from('users')
-        .select('*, doctors (specialization, photo_url)', { count: 'exact' })
+        .select(
+          '*, doctor_data:doctors(specialization, photo_url, department:departments(name))',
+          {
+            count: 'exact',
+          }
+        )
         .order('created_at', { ascending: false })
         .neq('id', user.id);
 
@@ -67,7 +72,7 @@ export default async function handler(
     }
   } else if (req.method === 'POST') {
     try {
-      console.log(req.body)
+      console.log(req.body);
       const {
         first_name,
         last_name,
@@ -101,11 +106,9 @@ export default async function handler(
       }
 
       if (existingUser && existingUser.length > 0) {
-        return res
-          .status(409)
-          .json({
-            error: 'Пользователь с данным номером телефона уже существует',
-          });
+        return res.status(409).json({
+          error: 'Пользователь с данным номером телефона уже существует',
+        });
       }
 
       // Валидация данных доктора

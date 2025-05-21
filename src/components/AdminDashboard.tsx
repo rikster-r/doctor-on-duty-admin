@@ -128,6 +128,9 @@ export default function AdminDashboard() {
                       Роль
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium tracking-tight">
+                      Отделение
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium tracking-tight">
                       Специализация
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium tracking-tight">
@@ -161,7 +164,14 @@ export default function AdminDashboard() {
                         {user.role === 'admin' ? 'Администратор' : 'Доктор'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-sm">
-                        {user.specialization ?? '-'}
+                        {user.doctor_data
+                          ? user.doctor_data.department.name
+                          : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-sm">
+                        {user.doctor_data
+                          ? user.doctor_data.specialization
+                          : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-sm"></td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">

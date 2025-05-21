@@ -6,8 +6,11 @@ type User = {
   password_hash: string;
   role: string;
   created_at: string;
-  specialization?: string;
-  photo_url?: string;
+  doctor_data?: {
+    specialization: string;
+    photo_url: string;
+    department: { name: string };
+  };
 };
 
 type UsersPanelData = {
