@@ -13,6 +13,7 @@ import Pagination from './Pagination';
 import { toast } from 'react-toastify';
 import AddUserModal from './modals/AddUserModal';
 import EditUserModal from './modals/EditUserModal';
+import { CldImage } from 'next-cloudinary';
 
 const pageSize = 50;
 
@@ -151,11 +152,24 @@ export default function AdminDashboard() {
                       className="hover:bg-gray-50 transition-colors duration-150"
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800 flex gap-2 items-center">
-                        <UserCircle
-                          size={24}
-                          weight="regular"
-                          className="text-gray-500"
-                        />
+                        {user.photo_url ? (
+                          <div className="w-10 h-10 rounded-full">
+                            <CldImage
+                              width="960"
+                              height="600"
+                              src={user.photo_url}
+                              alt=""
+                              className="rounded-full"
+                            />
+                          </div>
+                        ) : (
+                          <UserCircle
+                            size={40}
+                            weight="thin"
+                            className="text-gray-500"
+                          />
+                        )}
+
                         <span className="text-sm">
                           {user.first_name} {user.last_name}
                         </span>

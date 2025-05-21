@@ -12,24 +12,37 @@
     "@headlessui/react": "^2.2.3",
     "@supabase/ssr": "^0.6.1",
     "bcryptjs": "^3.0.2",
+    "cloudinary": "^2.6.1",
+    "formidable": "^3.5.4",
     "next": "15.3.2",
+    "next-cloudinary": "^6.16.0",
     "phosphor-react": "^1.4.1",
     "react": "^19.0.0",
+    "react-avatar-editor": "^13.0.2",
     "react-dom": "^19.0.0",
+    "react-dropzone": "^14.3.8",
     "react-toastify": "^11.0.5",
     "swr": "^2.3.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/formidable": "^3.4.5",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20",
     "@types/react": "^19",
+    "@types/react-avatar-editor": "^13.0.4",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "jsonwebtoken": "^9.0.2",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "react-avatar-editor": {
+      "react": ">=18.0.0",
+      "react-dom": ">=18.0.0"
+    }
   }
 }

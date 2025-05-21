@@ -8,6 +8,7 @@ type FormDataType = {
   password: string;
   specialization: string;
   departmentId: number;
+  profileImage: File | null;
 };
 
 type Props = {

@@ -2,6 +2,14 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import createClient from '@/lib/postgre';
 import { getUserFromJwt } from '@/lib/getUserFromJWT';
 import { hash } from 'bcryptjs';
+import cloudinary from '@/lib/cloudinary';
+import formidable from 'formidable';
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -36,7 +44,7 @@ export default async function handler(
       let query = supabase
         .from('users')
         .select(
-          '*, doctor_data:doctors(specialization, photo_url, department:departments(id, name))',
+          '*, doctor_data:doctors(specialization, department:departments(id, name))',
           {
             count: 'exact',
           }
@@ -71,7 +79,10 @@ export default async function handler(
         .json({ message: 'Server error', error: (error as Error).message });
     }
   } else if (req.method === 'POST') {
+    const form = formidable({ multiples: true });
+
     try {
+      // Парсинг
       const {
         first_name,
         last_name,
@@ -80,7 +91,35 @@ export default async function handler(
         role,
         department_id,
         specialization,
-      } = req.body;
+        profile_image,
+      }: {
+        first_name: string;
+        last_name: string;
+        phone_number: string;
+        password: string;
+        role: string;
+        department_id: number;
+        specialization: string;
+        profile_image: formidable.File | null;
+      } = await new Promise(function (resolve, reject) {
+        form.parse(req, (err, fields, files) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+
+          resolve({
+            first_name: fields.first_name?.at(0) ?? '',
+            last_name: fields.last_name?.at(0) ?? '',
+            phone_number: fields.phone_number?.at(0) ?? '',
+            password: fields.password?.at(0) ?? '',
+            role: fields.role?.at(0) ?? '',
+            department_id: Number(fields.department_id?.at(0)) ?? 0,
+            specialization: fields.specialization?.at(0) ?? '',
+            profile_image: files.profile_image?.at(0) ?? null,
+          });
+        });
+      });
 
       // Валидация обязательных данных
       if (!first_name || !last_name || !phone_number || !password || !role) {
@@ -117,6 +156,16 @@ export default async function handler(
 
       const hashedPassword = await hash(password, 10);
 
+      // Сохранение картинки
+      let imageData;
+      if (profile_image) {
+        imageData = await cloudinary.uploader.upload(profile_image.filepath, {
+          folder: 'doctoronduty/avatars',
+          resource_type: 'image',
+          public_id: profile_image.newFilename,
+        });
+      }
+
       const { data: user, error: insertError } = await supabase
         .from('users')
         .insert([
@@ -126,6 +175,7 @@ export default async function handler(
             phone_number,
             password_hash: hashedPassword,
             role,
+            photo_url: imageData?.secure_url ?? null,
           },
         ])
         .select()
@@ -152,6 +202,7 @@ export default async function handler(
       console.error(error);
       return res.status(500).json({ error: 'Внутренняя ошибка сервера' });
     }
+    return res.status(200).json({ error: 'sc' });
   }
 
   return res.status(405).json({ error: 'Метод не разрешен' });

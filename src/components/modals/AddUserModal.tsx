@@ -6,12 +6,24 @@ import { KeyedMutator } from 'swr';
 import { toast } from 'react-toastify';
 import AddUserMainStep from './AddUserMainStep';
 import AddUserDoctorStep from './AddUserDoctorStep';
+import AddUserImageStep from './AddUserImageStep';
 
 type Props = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   mutateUsers: KeyedMutator<UsersPanelData>;
   departments: Department[];
+};
+
+type FormDataType = {
+  firstName: string;
+  lastName: string;
+  role: string;
+  phoneNumber: string;
+  password: string;
+  specialization: string;
+  departmentId: number;
+  profileImage: File | null;
 };
 
 const AddUserModal = ({
@@ -21,7 +33,7 @@ const AddUserModal = ({
   departments,
 }: Props) => {
   const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormDataType>({
     firstName: '',
     lastName: '',
     role: '',
@@ -29,12 +41,13 @@ const AddUserModal = ({
     password: '',
     specialization: '',
     departmentId: 0,
+    profileImage: null,
   });
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
 
-    if (step < 2) {
+    if (step < 3) {
       setStep((step) => step + 1);
       return;
     }
@@ -43,20 +56,21 @@ const AddUserModal = ({
   };
 
   const createUser = async () => {
+    const formDataToSend = new FormData();
+    formDataToSend.append('first_name', formData.firstName);
+    formDataToSend.append('last_name', formData.lastName);
+    formDataToSend.append('role', formData.role);
+    formDataToSend.append('phone_number', formData.phoneNumber);
+    formDataToSend.append('password', formData.password);
+    formDataToSend.append('specialization', formData.specialization);
+    formDataToSend.append('department_id', formData.departmentId.toString());
+    if (formData.profileImage) {
+      formDataToSend.append('profile_image', formData.profileImage);
+    }
+
     const res = await fetch(`/api/users`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        role: formData.role,
-        phone_number: formData.phoneNumber,
-        password: formData.password,
-        specialization: formData.specialization,
-        department_id: formData.departmentId,
-      }),
+      body: formDataToSend,
     });
 
     if (res.ok) {
@@ -82,7 +96,8 @@ const AddUserModal = ({
           </button>
           <DialogTitle className="text-base font-bold text-center text-gray-800">
             {step === 1 && 'Добавить пользователя'}
-            {step === 2 && 'Введите данные доктора'}
+            {step === 2 && 'Выберите фото пользователя'}
+            {step === 3 && 'Введите данные доктора'}
           </DialogTitle>
           <button onClick={() => setIsOpen(false)} type="button">
             <X size={20} />
@@ -93,6 +108,9 @@ const AddUserModal = ({
           <AddUserMainStep formData={formData} setFormData={setFormData} />
         )}
         {step === 2 && (
+          <AddUserImageStep formData={formData} setFormData={setFormData} />
+        )}
+        {step === 3 && (
           <AddUserDoctorStep
             formData={formData}
             setFormData={setFormData}

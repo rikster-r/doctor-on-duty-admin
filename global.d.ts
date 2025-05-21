@@ -6,9 +6,9 @@ type User = {
   password_hash: string;
   role: string;
   created_at: string;
+  photo_url: string;
   doctor_data?: {
     specialization: string;
-    photo_url: string;
     department: { id: number; name: string };
   };
 };
