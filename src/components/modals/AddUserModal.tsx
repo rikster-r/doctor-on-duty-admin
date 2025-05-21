@@ -34,8 +34,8 @@ const AddUserModal = ({
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
 
-    if (formData.role === 'doctor' && step === 1) {
-      setStep(2);
+    if (step < 2) {
+      setStep((step) => step + 1);
       return;
     }
 

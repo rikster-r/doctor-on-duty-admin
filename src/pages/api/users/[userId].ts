@@ -61,19 +61,7 @@ export default async function handler(
         .json({ error: updateError.message });
     }
 
-    // Удалить данные доктора если он изменяется на администратора
-    if (role === 'admin') {
-      const { error: doctorDeleteError } = await supabase
-        .from('doctors')
-        .delete()
-        .eq('user_id', userId);
-
-      if (doctorDeleteError) {
-        return res
-          .status(Number(doctorDeleteError.code))
-          .json({ error: doctorDeleteError.message });
-      }
-    } else if (role === 'doctor' && (department_id || specialization)) {
+    if (role === 'doctor' && (department_id || specialization)) {
       const { error: doctorUpdateError } = await supabase
         .from('doctors')
         .upsert(

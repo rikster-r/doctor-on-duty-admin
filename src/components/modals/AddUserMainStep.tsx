@@ -147,7 +147,7 @@ const AddUserMainStep = ({ formData, setFormData }: Props) => {
           !formData.password
         }
       >
-        {formData.role === 'admin' ? 'Добавить' : 'Продолжить'}
+        Продолжить
       </button>
     </div>
   );

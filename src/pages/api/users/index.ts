@@ -136,7 +136,7 @@ export default async function handler(
         return res.status(500).json({ error: 'Внутренняя ошибка сервера' });
       }
 
-      if (role === 'doctor') {
+      if (department_id || specialization) {
         const { error: insertError } = await supabase
           .from('doctors')
           .insert([{ user_id: user.id, department_id, specialization }]);

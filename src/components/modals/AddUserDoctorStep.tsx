@@ -27,6 +27,14 @@ const AddUserDoctorStep = ({ formData, setFormData, departments }: Props) => {
     }));
   };
 
+  const skipStep = () => {
+    setFormData((prev) => ({
+      ...prev,
+      departmentId: 0,
+      specialization: '',
+    }));
+  };
+
   return (
     <div>
       <div className="mb-4 group">
@@ -77,12 +85,17 @@ const AddUserDoctorStep = ({ formData, setFormData, departments }: Props) => {
           className="peer w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-sm"
         />
       </div>
-      <button
-        className="w-full bg-blue-500 text-white font-semibold py-3 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-gray-200"
-        disabled={!formData.specialization || !formData.departmentId}
-      >
-        Добавить
-      </button>
+      <div className="flex gap-2">
+        <button
+          className="w-full bg-white text-blue-500 border border-blue-500 font-semibold py-3 rounded-xl hover:text-blue-600 hover:border-blue-600 transition disabled:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-gray-200"
+          onClick={skipStep}
+        >
+          Пропустить
+        </button>
+        <button className="w-full bg-blue-500 text-white font-semibold py-3 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-gray-200">
+          Добавить
+        </button>
+      </div>
     </div>
   );
 };
