@@ -11,15 +11,9 @@ import { fetcher } from '@/lib/fetcher';
 import useSWR from 'swr';
 import Pagination from './Pagination';
 import { toast } from 'react-toastify';
+import AddUserModal from './modals/AddUserModal';
 
 const pageSize = 50;
-
-type UsersData = {
-  users: User[];
-  currentPage: number;
-  totalPages: number;
-  totalUsers: number;
-};
 
 export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -28,12 +22,10 @@ export default function AdminDashboard() {
     data,
     mutate: mutateUsers,
     isLoading,
-  } = useSWR<UsersData>(
-    searchQuery
-      ? `/api/users?search=${encodeURIComponent(
-          searchQuery
-        )}&page=${page}&pageSize=${pageSize}`
-      : `/api/users?page=${page}&pageSize=${pageSize}`,
+  } = useSWR<UsersPanelData>(
+    `/api/users?page=${page}&pageSize=${pageSize}&search=${encodeURIComponent(
+      searchQuery
+    )}`,
     fetcher,
     {
       keepPreviousData: true,
@@ -41,6 +33,12 @@ export default function AdminDashboard() {
   );
   const users = useMemo(() => (data ? data.users : []), [data]);
   const userCount = useMemo(() => (data ? data.totalUsers : 0), [data]);
+  const { data: departments } = useSWR<Department[]>(
+    `/api/departments`,
+    fetcher
+  );
+
+  const [addUserModalOpen, setAddUserModalOpen] = useState(false);
 
   const deleteUser = async (id: number) => {
     const res = await fetch(`/api/users/${id}`, {
@@ -52,7 +50,7 @@ export default function AdminDashboard() {
       toast.error(data.error);
     } else {
       toast.success('Пользователь успешно удален');
-      mutateUsers((currentData?: UsersData) => {
+      mutateUsers((currentData?: UsersPanelData) => {
         if (!currentData) return currentData;
 
         const filteredUsers = currentData.users.filter(
@@ -74,7 +72,7 @@ export default function AdminDashboard() {
       description="Контролируй пользователей приложения"
     >
       <main className="flex-1 max-w-screen lg:max-w-[1200px] p-2 lg:px-6">
-        {/* Controls */}
+        {/* Управление */}
         <div className="flex flex-col p-2 mb-2">
           <div className="mb-2">
             <h2 className="text-lg font-semibold">Управление пользователями</h2>
@@ -94,7 +92,10 @@ export default function AdminDashboard() {
             />
           </div>
           <div className="w-full flex">
-            <button className="text-sm flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full transition-colors duration-200">
+            <button
+              className="text-sm flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-full transition-colors duration-200"
+              onClick={() => setAddUserModalOpen(true)}
+            >
               <Plus size={14} weight="bold" />
               Добавить пользователя
             </button>
@@ -102,6 +103,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Users table */}
+        {/* Идет изначальная загрузка */}
         {isLoading && !searchQuery && (
           <div className="rounded-xl shadow-md bg-white border border-gray-100 overflow-auto">
             <p className="text-center py-6 text-gray-600 font-medium text-sm">
@@ -109,7 +111,8 @@ export default function AdminDashboard() {
             </p>
           </div>
         )}
-        {!isLoading && (
+        {/* Не идет загрузка, либо идет загрузка от поиска */}
+        {(!isLoading || (isLoading && searchQuery)) && (
           <div className="rounded-xl shadow-md bg-white border border-gray-100 overflow-auto">
             {users.length > 0 ? (
               <table className="divide-y divide-gray-100 w-full">
@@ -197,6 +200,15 @@ export default function AdminDashboard() {
               onPageChange={setPage}
             />
           </div>
+        )}
+
+        {addUserModalOpen && (
+          <AddUserModal
+            isOpen={addUserModalOpen}
+            setIsOpen={setAddUserModalOpen}
+            mutateUsers={mutateUsers}
+            departments={departments ?? []}
+          />
         )}
       </main>
     </Layout>

@@ -9,3 +9,17 @@ type User = {
   specialization?: string;
   photo_url?: string;
 };
+
+type UsersPanelData = {
+  users: User[];
+  currentPage: number;
+  totalPages: number;
+  totalUsers: number;
+};
+
+type Department = {
+  id: number;
+  name: string;
+  photo_url: string;
+  created_at: string;
+};

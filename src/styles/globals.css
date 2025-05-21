@@ -12,3 +12,9 @@ body {
 #__next {
   flex: 1 1 auto;
 }
+
+select {
+    -moz-appearance:none; /* Firefox */
+    -webkit-appearance:none; /* Safari and Chrome */
+    appearance:none;
+}

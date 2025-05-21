@@ -42,11 +42,6 @@ export default async function handler(
       return res.status(409).json({ error: 'Пользователь уже существует' });
     }
 
-    // Создать доктора, если роль доктор
-    if (role === 'doctor') {
-      // todo: Implement doctor-specific logic if needed
-    }
-
     // Хеширование пароля
     const hashedPassword = await hash(password, 10);
 
