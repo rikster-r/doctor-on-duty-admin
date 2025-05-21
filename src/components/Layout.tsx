@@ -46,7 +46,9 @@ const Layout = ({ children, title, description }: Props) => {
           <Sidebar />
         </div>
 
-        <div className="flex w-full justify-center lg:ml-72">{children}</div>
+        <div className="flex w-full justify-center lg:ml-72 h-full">
+          {children}
+        </div>
       </div>
     </>
   );

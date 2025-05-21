@@ -12,6 +12,7 @@ import useSWR from 'swr';
 import Pagination from './Pagination';
 import { toast } from 'react-toastify';
 import AddUserModal from './modals/AddUserModal';
+import EditUserModal from './modals/EditUserModal';
 
 const pageSize = 50;
 
@@ -39,6 +40,8 @@ export default function AdminDashboard() {
   );
 
   const [addUserModalOpen, setAddUserModalOpen] = useState(false);
+  const [editUserModalOpen, setEditUserModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const deleteUser = async (id: number) => {
     const res = await fetch(`/api/users/${id}`, {
@@ -71,7 +74,7 @@ export default function AdminDashboard() {
       title="Панель пользователей"
       description="Контролируй пользователей приложения"
     >
-      <main className="flex-1 max-w-screen lg:max-w-[1200px] p-2 lg:px-6">
+      <main className="flex-1 p-2 lg:px-6 max-w-screen lg:max-w-[calc(100vw-var(--spacing)*72)]">
         {/* Управление */}
         <div className="flex flex-col p-2 mb-2">
           <div className="mb-2">
@@ -115,7 +118,7 @@ export default function AdminDashboard() {
         {(!isLoading || (isLoading && searchQuery)) && (
           <div className="rounded-xl shadow-md bg-white border border-gray-100 overflow-auto">
             {users.length > 0 ? (
-              <table className="divide-y divide-gray-100 w-full">
+              <table className="divide-y divide-gray-100 w-full ">
                 <thead className="bg-gray-50 text-gray-700">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium tracking-tight">
@@ -179,6 +182,10 @@ export default function AdminDashboard() {
                           <button
                             aria-label="Edit User"
                             className="text-blue-500 hover:text-blue-700 transition-colors duration-150"
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setEditUserModalOpen(true);
+                            }}
                           >
                             <PencilSimple size={18} weight="bold" />
                           </button>
@@ -216,6 +223,15 @@ export default function AdminDashboard() {
           <AddUserModal
             isOpen={addUserModalOpen}
             setIsOpen={setAddUserModalOpen}
+            mutateUsers={mutateUsers}
+            departments={departments ?? []}
+          />
+        )}
+        {editUserModalOpen && selectedUser && (
+          <EditUserModal
+            isOpen={editUserModalOpen}
+            setIsOpen={setEditUserModalOpen}
+            user={selectedUser}
             mutateUsers={mutateUsers}
             departments={departments ?? []}
           />

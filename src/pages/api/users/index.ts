@@ -36,7 +36,7 @@ export default async function handler(
       let query = supabase
         .from('users')
         .select(
-          '*, doctor_data:doctors(specialization, photo_url, department:departments(name))',
+          '*, doctor_data:doctors(specialization, photo_url, department:departments(id, name))',
           {
             count: 'exact',
           }
@@ -72,7 +72,6 @@ export default async function handler(
     }
   } else if (req.method === 'POST') {
     try {
-      console.log(req.body);
       const {
         first_name,
         last_name,

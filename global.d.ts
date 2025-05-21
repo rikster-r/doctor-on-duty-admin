@@ -9,7 +9,7 @@ type User = {
   doctor_data?: {
     specialization: string;
     photo_url: string;
-    department: { name: string };
+    department: { id: number; name: string };
   };
 };
 

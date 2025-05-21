@@ -45,7 +45,7 @@ const AddUserDoctorStep = ({ formData, setFormData, departments }: Props) => {
             className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-sm"
           >
             <option value={0} disabled>
-              Выберите роль
+              Выберите отделение
             </option>
             {departments.map((department) => (
               <option value={department.id} key={department.id}>
