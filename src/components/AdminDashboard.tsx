@@ -14,6 +14,9 @@ import { toast } from 'react-toastify';
 import AddUserModal from './modals/AddUserModal';
 import EditUserModal from './modals/EditUserModal';
 import { CldImage } from 'next-cloudinary';
+import UserMenu from './UserMenu';
+import ChangePasswordModal from './modals/ChangePasswordModal';
+import ChangeImageModal from './modals/ChangeImageModal';
 
 const pageSize = 50;
 
@@ -42,6 +45,8 @@ export default function AdminDashboard() {
 
   const [addUserModalOpen, setAddUserModalOpen] = useState(false);
   const [editUserModalOpen, setEditUserModalOpen] = useState(false);
+  const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
+  const [changeImageModalOpen, setChangeImageModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const deleteUser = async (id: number) => {
@@ -152,23 +157,36 @@ export default function AdminDashboard() {
                       className="hover:bg-gray-50 transition-colors duration-150"
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800 flex gap-2 items-center">
-                        {user.photo_url ? (
-                          <div className="w-10 h-10 rounded-full">
+                        <div className="w-10 h-10 rounded-full relative group">
+                          {user.photo_url ? (
                             <CldImage
                               width="960"
                               height="600"
                               src={user.photo_url}
                               alt=""
-                              className="rounded-full"
+                              className="rounded-full object-cover w-full h-full"
                             />
-                          </div>
-                        ) : (
-                          <UserCircle
-                            size={40}
-                            weight="thin"
-                            className="text-gray-500"
-                          />
-                        )}
+                          ) : (
+                            <UserCircle
+                              size={40}
+                              weight="thin"
+                              className="text-gray-500"
+                            />
+                          )}
+                          <button
+                            className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setChangeImageModalOpen(true);
+                            }}
+                          >
+                            <PencilSimple
+                              size={18}
+                              weight="bold"
+                              className="text-white"
+                            />
+                          </button>
+                        </div>
 
                         <span className="text-sm">
                           {user.first_name} {user.last_name}
@@ -194,7 +212,7 @@ export default function AdminDashboard() {
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <div className="flex items-center justify-center gap-3">
                           <button
-                            aria-label="Edit User"
+                            aria-label="Редактировать пользователя"
                             className="text-blue-500 hover:text-blue-700 transition-colors duration-150"
                             onClick={() => {
                               setSelectedUser(user);
@@ -204,12 +222,22 @@ export default function AdminDashboard() {
                             <PencilSimple size={18} weight="bold" />
                           </button>
                           <button
-                            aria-label="Delete User"
+                            aria-label="Удалить пользователя"
                             className="text-red-500 hover:text-red-700 transition-colors duration-150"
                             onClick={() => deleteUser(user.id)}
                           >
                             <Trash size={18} weight="bold" />
                           </button>
+                          <UserMenu
+                            openChangePasswordModal={() => {
+                              setSelectedUser(user);
+                              setChangePasswordModalOpen(true);
+                            }}
+                            openChangeImageModal={() => {
+                              setSelectedUser(user);
+                              setChangeImageModalOpen(true);
+                            }}
+                          />
                         </div>
                       </td>
                     </tr>
@@ -248,6 +276,21 @@ export default function AdminDashboard() {
             user={selectedUser}
             mutateUsers={mutateUsers}
             departments={departments ?? []}
+          />
+        )}
+        {changePasswordModalOpen && selectedUser && (
+          <ChangePasswordModal
+            isOpen={changePasswordModalOpen}
+            setIsOpen={setChangePasswordModalOpen}
+            user={selectedUser}
+          />
+        )}
+        {changeImageModalOpen && selectedUser && (
+          <ChangeImageModal
+            isOpen={changeImageModalOpen}
+            setIsOpen={setChangeImageModalOpen}
+            user={selectedUser}
+            mutateUsers={mutateUsers}
           />
         )}
       </main>

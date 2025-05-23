@@ -202,7 +202,6 @@ export default async function handler(
       console.error(error);
       return res.status(500).json({ error: 'Внутренняя ошибка сервера' });
     }
-    return res.status(200).json({ error: 'sc' });
   }
 
   return res.status(405).json({ error: 'Метод не разрешен' });

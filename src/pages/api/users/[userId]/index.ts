@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import createClient from '@/lib/postgre';
+import { hash } from 'bcryptjs';
 
 export default async function handler(
   req: NextApiRequest,
@@ -31,6 +32,7 @@ export default async function handler(
       last_name,
       phone_number,
       role,
+      password,
       department_id,
       specialization,
     } = req.body;
@@ -39,7 +41,7 @@ export default async function handler(
     if (role && !['doctor', 'admin'].includes(role)) {
       return res.status(400).json({ error: 'Недопустимая роль' });
     }
-    if (!/^\+?[1-9]\d{1,14}$/.test(phone_number)) {
+    if (phone_number && !/^\+?[1-9]\d{1,14}$/.test(phone_number)) {
       return res.status(400).json({ error: 'Недопустимый номер телефона' });
     }
 
@@ -51,6 +53,7 @@ export default async function handler(
           ...(last_name && { last_name }),
           ...(phone_number && { phone_number }),
           ...(role && { role }),
+          ...(password && { password_hash: await hash(password, 10) }),
         },
       ])
       .eq('id', userId);
