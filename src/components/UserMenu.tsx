@@ -18,7 +18,10 @@ const UserMenu = ({ openChangePasswordModal, openChangeImageModal }: Props) => {
             weight="bold"
           />
         </MenuButton>
-        <MenuItems className="z-50 absolute right-0 mt-2 w-56 origin-top-right rounded-xl bg-white shadow-lg border-1 border-gray-300 ring-opacity-5 focus:outline-none">
+        <MenuItems
+          anchor={{ to: 'bottom end' }}
+          className="z-50 absolute right-0 mt-2 w-56 origin-top-right rounded-xl bg-white shadow-lg border-1 border-gray-300 ring-opacity-5 focus:outline-none"
+        >
           <MenuItem>
             <button
               onClick={() => openChangePasswordModal(true)}
