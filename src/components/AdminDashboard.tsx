@@ -49,6 +49,8 @@ export default function AdminDashboard() {
   const [changeImageModalOpen, setChangeImageModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
+  console.log(users);
+
   const deleteUser = async (id: number) => {
     const res = await fetch(`/api/users/${id}`, {
       method: 'DELETE',
@@ -199,12 +201,12 @@ export default function AdminDashboard() {
                         {user.role === 'admin' ? 'Администратор' : 'Доктор'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-sm">
-                        {user.doctor_data
+                        {user.doctor_data?.department
                           ? user.doctor_data.department.name
                           : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-sm">
-                        {user.doctor_data
+                        {user.doctor_data?.specialization
                           ? user.doctor_data.specialization
                           : '-'}
                       </td>

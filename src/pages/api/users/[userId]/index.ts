@@ -64,7 +64,7 @@ export default async function handler(
         .json({ error: updateError.message });
     }
 
-    if (role === 'doctor' && (department_id || specialization)) {
+    if (department_id || specialization) {
       const { error: doctorUpdateError } = await supabase
         .from('doctors')
         .upsert(
@@ -79,6 +79,7 @@ export default async function handler(
         );
 
       if (doctorUpdateError) {
+        console.log(doctorUpdateError);
         return res
           .status(Number(doctorUpdateError.code))
           .json({ error: doctorUpdateError.message });
