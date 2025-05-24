@@ -19,9 +19,9 @@ export default async function handler(
     return res.status(401).json({ error: 'Нет доступа' });
   }
 
-  const { userId } = req.query;
+  const { departmentId } = req.query;
 
-  if (!userId) {
+  if (!departmentId) {
     return res.status(400).json({ error: 'Некорректный айди пользователя' });
   }
 
@@ -29,11 +29,12 @@ export default async function handler(
     const form = formidable({ multiples: true });
 
     try {
-      // Парсинг
       const {
-        profile_image,
+        icon,
+        name,
       }: {
-        profile_image: formidable.File | null;
+        icon: formidable.File | null;
+        name: string | null;
       } = await new Promise(function (resolve, reject) {
         form.parse(req, (err, fields, files) => {
           if (err) {
@@ -42,35 +43,39 @@ export default async function handler(
           }
 
           resolve({
-            profile_image: files.profile_image?.at(0) ?? null,
+            icon: files.icon?.at(0) ?? null,
+            name: Array.isArray(fields.name)
+              ? fields.name[0]
+              : fields.name ?? null,
           });
         });
       });
 
-      if (!profile_image) {
-        return res
-          .status(400)
-          .json('Отстутсвует картинка профиля пользователя.');
+      const updates: Record<string, File | string> = {};
+
+      if (name) {
+        updates.name = name;
       }
 
-      // Сохранение картинки
-      const imageData = await cloudinary.uploader.upload(
-        profile_image.filepath,
-        {
+      console.log(icon);
+
+      if (icon) {
+        const imageData = await cloudinary.uploader.upload(icon.filepath, {
           folder: 'doctoronduty/avatars',
           resource_type: 'image',
-          public_id: profile_image.newFilename,
-        }
-      );
+          public_id: icon.newFilename,  
+        });
+        updates.photo_url = imageData.secure_url;
+      }
 
-      const { data: user, error: updateError } = await supabase
-        .from('users')
-        .update([
-          {
-            photo_url: imageData.secure_url,
-          },
-        ])
-        .eq('id', userId)
+      if (Object.keys(updates).length === 0) {
+        return res.status(400).json({ error: 'Нет данных для обновления' });
+      }
+
+      const { data: department, error: updateError } = await supabase
+        .from('departments')
+        .update(updates)
+        .eq('id', departmentId)
         .select()
         .single();
 
@@ -78,7 +83,7 @@ export default async function handler(
         return res.status(500).json({ error: updateError.message });
       }
 
-      return res.status(200).json({ user });
+      return res.status(200).json({ department });
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: 'Внутренняя ошибка сервера' });
