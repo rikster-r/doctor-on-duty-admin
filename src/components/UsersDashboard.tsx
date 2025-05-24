@@ -5,6 +5,7 @@ import {
   Plus,
   PencilSimple,
   Trash,
+  NotePencil,
 } from 'phosphor-react';
 import Layout from './Layout';
 import { fetcher } from '@/lib/fetcher';
@@ -20,7 +21,7 @@ import ChangeImageModal from './modals/ChangeImageModal';
 
 const pageSize = 50;
 
-export default function AdminDashboard() {
+export default function UsersDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const {
@@ -48,8 +49,6 @@ export default function AdminDashboard() {
   const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
   const [changeImageModalOpen, setChangeImageModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-
-  console.log(users);
 
   const deleteUser = async (id: number) => {
     const res = await fetch(`/api/users/${id}`, {
@@ -79,14 +78,17 @@ export default function AdminDashboard() {
 
   return (
     <Layout
-      title="Панель пользователей"
+      title="Панель пользователей | Дежурный доктор"
       description="Контролируй пользователей приложения"
     >
       <main className="flex-1 p-2 lg:px-6 max-w-screen lg:max-w-[calc(100vw-var(--spacing)*72)]">
         {/* Управление */}
-        <div className="flex flex-col p-2 mb-2">
-          <div className="mb-2">
-            <h2 className="text-lg font-semibold">Управление пользователями</h2>
+        <div className="flex flex-col p-2 mb-2 max-w-[1200px] mx-auto">
+          <div className="mb-4">
+            <h1 className="text-lg font-semibold">Панель пользователей</h1>
+            <p className="text-gray-500 text-sm">
+              Создание и редактирование профилей, графиков и ролей
+            </p>
           </div>
           <div className="relative mb-2">
             <MagnifyingGlass
@@ -116,7 +118,7 @@ export default function AdminDashboard() {
         {/* Users table */}
         {/* Идет изначальная загрузка */}
         {isLoading && !searchQuery && (
-          <div className="rounded-xl shadow-md bg-white border border-gray-100 overflow-auto">
+          <div className="rounded-xl shadow-md bg-white border border-gray-100 overflow-auto max-w-[1200px] mx-auto">
             <p className="text-center py-6 text-gray-600 font-medium text-sm">
               Загрузка...
             </p>
@@ -124,7 +126,7 @@ export default function AdminDashboard() {
         )}
         {/* Не идет загрузка, либо идет загрузка от поиска */}
         {(!isLoading || (isLoading && searchQuery)) && (
-          <div className="rounded-xl shadow-md bg-white border border-gray-100 overflow-auto">
+          <div className="rounded-xl shadow-md bg-white border border-gray-100 overflow-auto max-w-[1200px] mx-auto">
             {users.length > 0 ? (
               <table className="divide-y divide-gray-100 w-full ">
                 <thead className="bg-gray-50 text-gray-700">
@@ -221,7 +223,7 @@ export default function AdminDashboard() {
                               setEditUserModalOpen(true);
                             }}
                           >
-                            <PencilSimple size={18} weight="bold" />
+                            <NotePencil size={18} weight="bold" />
                           </button>
                           <button
                             aria-label="Удалить пользователя"
@@ -254,7 +256,7 @@ export default function AdminDashboard() {
           </div>
         )}
         {userCount > pageSize && (
-          <div className="mt-4 flex justify-end">
+          <div className="mt-4 flex justify-end max-w-[1200px] mx-auto">
             <Pagination
               currentPage={page}
               totalPages={userCount}

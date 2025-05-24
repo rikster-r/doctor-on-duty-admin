@@ -1,4 +1,4 @@
-import AdminDashboard from '@/components/AdminDashboard';
+import UsersDashboard from '@/components/UsersDashboard';
 import { GetServerSidePropsContext } from 'next';
 
 export const getServerSideProps = (context: GetServerSidePropsContext) => {
@@ -18,8 +18,8 @@ export const getServerSideProps = (context: GetServerSidePropsContext) => {
   };
 };
 
-function App() {
-  return <AdminDashboard />;
+function Users() {
+  return <UsersDashboard />;
 }
 
-export default App;
+export default Users;
