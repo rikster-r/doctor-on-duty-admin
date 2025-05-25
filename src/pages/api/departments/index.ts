@@ -1,5 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import createClient from '@/lib/postgre';
+import formidable from 'formidable';
+import cloudinary from '@/lib/cloudinary';
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -25,6 +33,68 @@ export default async function handler(
       return res
         .status(500)
         .json({ message: 'Server error', error: (error as Error).message });
+    }
+  }
+
+  if (req.method === 'POST') {
+    try {
+      const form = formidable({ multiples: false });
+
+      const {
+        icon,
+        name,
+      }: {
+        icon: formidable.File | null;
+        name: string | null;
+      } = await new Promise((resolve, reject) => {
+        form.parse(req, (err, fields, files) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+
+          resolve({
+            icon: files.icon?.at(0) ?? null,
+            name: Array.isArray(fields.name)
+              ? fields.name[0]
+              : fields.name ?? null,
+          });
+        });
+      });
+
+      if (!name) {
+        return res
+          .status(400)
+          .json({ error: 'Название отделения обязательно' });
+      }
+
+      if (!icon) {
+        return res.status(400).json({ error: 'Иконка отделения обязательно' });
+      }
+
+      const imageData = await cloudinary.uploader.upload(icon.filepath, {
+        folder: 'doctoronduty/avatars',
+        resource_type: 'image',
+        public_id: icon.newFilename,
+      });
+
+      const { data: department, error } = await supabase
+        .from('departments')
+        .insert({
+          name,
+          photo_url: imageData.secure_url,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      return res.status(201).json({ department });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Внутренняя ошибка сервера' });
     }
   }
 }

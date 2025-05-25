@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import { ImageSquare, Trash, NotePencil, Plus } from 'phosphor-react';
 import { CldImage } from 'next-cloudinary';
 import EditDepartmentModal from './modals/EditDepartmentModal';
+import AddDepartmentModal from './modals/AddDepartmentModal';
 
 const DepartmentsDashboard = () => {
   const {
@@ -18,7 +19,7 @@ const DepartmentsDashboard = () => {
     Department | undefined
   >();
   const [editDepartmentModalOpen, setEditDepartmentModalOpen] = useState(false);
-  console.log(departments);
+  const [addDepartmentModalOpen, setAddDepartmentModalOpen] = useState(false);
 
   return (
     <Layout
@@ -36,7 +37,10 @@ const DepartmentsDashboard = () => {
             </p>
           </div>
           <div className="flex items-center">
-            <button className="flex items-center gap-2 bg-blue-500 text-white p-2 sm:px-4 sm:py-3 rounded-full hover:bg-blue-600">
+            <button
+              className="flex items-center gap-2 bg-blue-500 text-white p-2 sm:px-4 sm:py-3 rounded-full hover:bg-blue-600"
+              onClick={() => setAddDepartmentModalOpen(true)}
+            >
               <Plus size={18} />
               <span className="hidden sm:block">Добавить отделение</span>
             </button>
@@ -117,6 +121,13 @@ const DepartmentsDashboard = () => {
           isOpen={editDepartmentModalOpen}
           setIsOpen={setEditDepartmentModalOpen}
           department={selectedDepartment}
+          mutateDepartments={mutateDepartments}
+        />
+      )}
+      {addDepartmentModalOpen && (
+        <AddDepartmentModal
+          isOpen={addDepartmentModalOpen}
+          setIsOpen={setAddDepartmentModalOpen}
           mutateDepartments={mutateDepartments}
         />
       )}

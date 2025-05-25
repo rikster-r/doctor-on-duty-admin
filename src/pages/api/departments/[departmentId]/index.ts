@@ -57,8 +57,6 @@ export default async function handler(
         updates.name = name;
       }
 
-      console.log(icon);
-
       if (icon) {
         const imageData = await cloudinary.uploader.upload(icon.filepath, {
           folder: 'doctoronduty/avatars',

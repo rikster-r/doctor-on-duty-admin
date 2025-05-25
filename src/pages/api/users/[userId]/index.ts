@@ -79,7 +79,6 @@ export default async function handler(
         );
 
       if (doctorUpdateError) {
-        console.log(doctorUpdateError);
         return res
           .status(Number(doctorUpdateError.code))
           .json({ error: doctorUpdateError.message });

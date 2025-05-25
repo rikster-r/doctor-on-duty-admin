@@ -33,11 +33,11 @@ export default function CustomFileInput({ name, file, setFile }: Props) {
   return (
     <div className="flex items-center rounded-md overflow-hidden border border-gray-300 max-w-xl">
       <button type="button" onClick={handleButtonClick} className="flex w-full">
-        <p className="bg-blue-600 text-white text-sm hover:bg-blue-500 px-4 py-2">
+        <p className="bg-blue-600 text-white text-sm hover:bg-blue-500 px-4 py-3">
           Обзор...
         </p>
 
-        <p className="px-4 py-2 text-sm text-left text-gray-700 bg-gray-50 w-full truncate">
+        <p className="px-4 py-3 text-sm text-left text-gray-700 bg-gray-50 w-full truncate">
           {file ? file.name : 'Файл не выбран.'}
         </p>
       </button>
