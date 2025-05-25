@@ -21,7 +21,10 @@ export default async function handler(
 
   if (req.method === 'GET') {
     try {
-      const { data, error } = await supabase.from('departments').select('*');
+      const { data, error } = await supabase
+        .from('departments')
+        .select('*')
+        .order('order', { ascending: true });
 
       if (error) {
         return res.status(Number(error.code)).json({ error: error.message });

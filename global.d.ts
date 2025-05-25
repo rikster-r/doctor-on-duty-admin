@@ -24,5 +24,6 @@ type Department = {
   id: number;
   name: string;
   photo_url: string;
+  order: number;
   created_at: string;
 };

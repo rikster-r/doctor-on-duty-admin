@@ -1,13 +1,11 @@
+import { DepartmentsSortableList } from './DepartmentsSortableList';
 import Layout from './Layout';
 import { fetcher } from '@/lib/fetcher';
 import useSWR from 'swr';
-
 import React, { useState } from 'react';
-import { ImageSquare, Trash, NotePencil, Plus } from 'phosphor-react';
-import { CldImage } from 'next-cloudinary';
+import { Plus } from 'phosphor-react';
 import EditDepartmentModal from './modals/EditDepartmentModal';
 import AddDepartmentModal from './modals/AddDepartmentModal';
-import { toast } from 'react-toastify';
 
 const DepartmentsDashboard = () => {
   const {
@@ -21,20 +19,6 @@ const DepartmentsDashboard = () => {
   >();
   const [editDepartmentModalOpen, setEditDepartmentModalOpen] = useState(false);
   const [addDepartmentModalOpen, setAddDepartmentModalOpen] = useState(false);
-
-  const deleteDepartment = async (departmentId: number) => {
-    const res = await fetch(`/api/departments/${departmentId}`, {
-      method: 'DELETE',
-    });
-
-    if (res.ok) {
-      toast.success('Отделение успешно удалено');
-      mutateDepartments();
-    } else {
-      const data = await res.json();
-      toast.error(data.error || 'Ошибка при удалении отделения');
-    }
-  };
 
   return (
     <Layout
@@ -83,55 +67,12 @@ const DepartmentsDashboard = () => {
         )}
         {/* Список с отделениями */}
         {!isLoading && departments && departments.length > 0 && (
-          <div className="grid grid-cols-3 gap-2">
-            {departments.map((department) => (
-              <div
-                key={department.id}
-                className="min-h-[140px] sm:h-[150px] bg-white shadow-lg rounded-2xl p-3 sm:px-6 flex flex-col items-center gap-3 hover:shadow-xl transition-shadow relative"
-              >
-                <div className="relative w-full">
-                  {!department.photo_url ? (
-                    <div className="w-10  h-10 sm:w-12 sm:h-12 flex items-center ">
-                      <ImageSquare className="text-gray-600" size={24} />
-                    </div>
-                  ) : (
-                    <div className="text-blue-600 w-10 h-10 sm:w-12 sm:h-12 mr-auto">
-                      <CldImage
-                        width="800"
-                        height="800"
-                        src={department.photo_url}
-                        alt=""
-                        id="svg-image"
-                        className="object-cover w-full h-full text-blue-500"
-                      />
-                    </div>
-                  )}
-                </div>
-                <div className="w-full">
-                  <h2 className="text-[11px] sm:text-sm font-medium text-left text-gray-800">
-                    {department.name}
-                  </h2>
-                </div>
-                <div className="flex gap-3 mt-auto">
-                  <button
-                    className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
-                    onClick={() => {
-                      setSelectedDepartment(department);
-                      setEditDepartmentModalOpen(true);
-                    }}
-                  >
-                    <NotePencil size={18} />
-                  </button>
-                  <button
-                    className="text-gray-600 hover:text-gray-700 flex items-center gap-1 text-sm"
-                    onClick={() => deleteDepartment(department.id)}
-                  >
-                    <Trash size={18} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+          <DepartmentsSortableList
+            departments={departments}
+            setSelectedDepartment={setSelectedDepartment}
+            setEditDepartmentModalOpen={setEditDepartmentModalOpen}
+            mutate={mutateDepartments}
+          />
         )}
       </div>
       {editDepartmentModalOpen && selectedDepartment && (
