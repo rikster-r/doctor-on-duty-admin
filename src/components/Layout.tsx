@@ -18,7 +18,7 @@ const Layout = ({ children, title, description }: Props) => {
         <title>{title}</title>
         <meta name="description" content={description} />
       </Head>
-      <div className="flex flex-col lg:flex-row bg-[#ebf4fd] min-h-screen">
+      <div className="flex flex-col lg:flex-row bg-[#ebf4fd] h-full">
         <header className="lg:hidden w-full px-6 py-3 flex items-center bg-white text-blue-800 shadow sticky top-0 z-40">
           <div className="text-lg font-semibold">Дежурный доктор</div>
           <button className="ml-auto" onClick={openSidebar}>
