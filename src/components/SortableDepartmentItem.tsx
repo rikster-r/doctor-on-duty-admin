@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { CldImage } from 'next-cloudinary';
@@ -21,6 +22,16 @@ export default function SortableDepartmentItem({
   setEditDepartmentModalOpen,
   deleteDepartment,
 }: Props) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkIsMobile = () =>
+      setIsMobile(window.matchMedia('(max-width: 640px)').matches);
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
   const {
     attributes,
     listeners,
@@ -36,6 +47,7 @@ export default function SortableDepartmentItem({
     zIndex: isDragging ? 30 : 'auto',
     opacity: isDragging ? 0.95 : 1,
     scale: isDragging ? 1.02 : 1,
+    cursor: isDragging ? 'grabbing' : isMobile ? 'grab' : 'default',
   };
 
   return (
@@ -43,16 +55,20 @@ export default function SortableDepartmentItem({
       ref={setNodeRef}
       style={style}
       className="min-h-[140px] sm:min-h-[150px] bg-white shadow-lg hover:shadow-2xl hover:scale-105 rounded-2xl p-3 sm:px-6 flex flex-col items-center gap-3 transition-shadow relative"
+      {...(isMobile ? { ...attributes, ...listeners } : {})} // Перетаскивание через любую точку на диве на телефоне
     >
-      {' '}
-      <div
-        {...attributes}
-        {...listeners}
-        className="absolute top-2 right-2 cursor-grab text-gray-400 hover:text-gray-600"
-        title="Drag to reorder"
-      >
-        <DotsSixVertical size={20} weight="bold" />
-      </div>
+      {/* Перетаскивание через кнопку на десктопе*/}
+      {!isMobile && (
+        <div
+          {...attributes}
+          {...listeners}
+          className="absolute top-2 right-2 cursor-grab text-gray-400 hover:text-gray-600"
+          title="Перетаскивай, чтобы изменить расположение"
+        >
+          <DotsSixVertical size={20} weight="bold" />
+        </div>
+      )}
+
       <div className="relative w-full pointer-events-none">
         {!department.photo_url ? (
           <div className="w-10  h-10 sm:w-12 sm:h-12 flex items-center ">

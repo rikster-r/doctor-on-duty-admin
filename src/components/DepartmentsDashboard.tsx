@@ -25,7 +25,7 @@ const DepartmentsDashboard = () => {
       title="Отделения | Дежурный доктор"
       description="Управление отделениями больницы"
     >
-      <div className="min-h-screen p-4 w-full max-w-[700px]">
+      <div className="p-4 w-full max-w-[700px]">
         <div className="mb-6 flex justify-between">
           <div className="max-w-[80%]">
             <h1 className="text-lg font-bold text-gray-800">
