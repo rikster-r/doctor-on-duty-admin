@@ -41,7 +41,7 @@ const DepartmentsDashboard = () => {
       title="Отделения | Дежурный доктор"
       description="Управление отделениями больницы"
     >
-      <div className="min-h-screen p-4  w-full max-w-[700px]">
+      <div className="min-h-screen p-4 w-full max-w-[700px]">
         <div className="mb-6 flex justify-between">
           <div className="max-w-[80%]">
             <h1 className="text-lg font-bold text-gray-800">
@@ -87,7 +87,7 @@ const DepartmentsDashboard = () => {
             {departments.map((department) => (
               <div
                 key={department.id}
-                className="bg-white shadow-lg rounded-2xl p-4 sm:px-6 flex flex-col items-center gap-3 hover:shadow-xl transition-shadow relative"
+                className="min-h-[140px] sm:h-[150px] bg-white shadow-lg rounded-2xl p-3 sm:px-6 flex flex-col items-center gap-3 hover:shadow-xl transition-shadow relative"
               >
                 <div className="relative w-full">
                   {!department.photo_url ? (
@@ -97,8 +97,8 @@ const DepartmentsDashboard = () => {
                   ) : (
                     <div className="text-blue-600 w-10 h-10 sm:w-12 sm:h-12 mr-auto">
                       <CldImage
-                        width="1000"
-                        height="1000"
+                        width="800"
+                        height="800"
                         src={department.photo_url}
                         alt=""
                         id="svg-image"
@@ -108,7 +108,7 @@ const DepartmentsDashboard = () => {
                   )}
                 </div>
                 <div className="w-full">
-                  <h2 className="text-xs sm:text-sm font-medium text-left text-gray-800 max-w-[95%] overflow-hidden">
+                  <h2 className="text-[11px] sm:text-sm font-medium text-left text-gray-800">
                     {department.name}
                   </h2>
                 </div>
