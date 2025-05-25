@@ -61,7 +61,7 @@ export default async function handler(
         const imageData = await cloudinary.uploader.upload(icon.filepath, {
           folder: 'doctoronduty/avatars',
           resource_type: 'image',
-          public_id: icon.newFilename,  
+          public_id: icon.newFilename,
         });
         updates.photo_url = imageData.secure_url;
       }
@@ -85,6 +85,24 @@ export default async function handler(
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: 'Внутренняя ошибка сервера' });
+    }
+  } else if (req.method === 'DELETE') {
+    try {
+      const { data, error } = await supabase
+        .from('departments')
+        .delete()
+        .eq('id', departmentId)
+        .select()
+        .single();
+
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      return res.status(200).json(data);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Ошибка при удалении отдела' });
     }
   }
 }

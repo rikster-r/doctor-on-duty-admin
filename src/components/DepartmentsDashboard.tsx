@@ -7,6 +7,7 @@ import { ImageSquare, Trash, NotePencil, Plus } from 'phosphor-react';
 import { CldImage } from 'next-cloudinary';
 import EditDepartmentModal from './modals/EditDepartmentModal';
 import AddDepartmentModal from './modals/AddDepartmentModal';
+import { toast } from 'react-toastify';
 
 const DepartmentsDashboard = () => {
   const {
@@ -20,6 +21,20 @@ const DepartmentsDashboard = () => {
   >();
   const [editDepartmentModalOpen, setEditDepartmentModalOpen] = useState(false);
   const [addDepartmentModalOpen, setAddDepartmentModalOpen] = useState(false);
+
+  const deleteDepartment = async (departmentId: number) => {
+    const res = await fetch(`/api/departments/${departmentId}`, {
+      method: 'DELETE',
+    });
+
+    if (res.ok) {
+      toast.success('Отделение успешно удалено');
+      mutateDepartments();
+    } else {
+      const data = await res.json();
+      toast.error(data.error || 'Ошибка при удалении отделения');
+    }
+  };
 
   return (
     <Layout
@@ -107,7 +122,10 @@ const DepartmentsDashboard = () => {
                   >
                     <NotePencil size={18} />
                   </button>
-                  <button className="text-gray-600 hover:text-gray-700 flex items-center gap-1 text-sm">
+                  <button
+                    className="text-gray-600 hover:text-gray-700 flex items-center gap-1 text-sm"
+                    onClick={() => deleteDepartment(department.id)}
+                  >
                     <Trash size={18} />
                   </button>
                 </div>
