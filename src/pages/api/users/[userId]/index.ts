@@ -1,19 +1,19 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import createClient from '@/lib/postgre';
 import { hash } from 'bcryptjs';
+import { isUserAuthenticated } from '@/lib/auth';
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   const supabase = createClient(req, res);
-  const token = req.cookies.authToken;
-  if (!token) {
+  const authenticated = isUserAuthenticated(req);
+  if (!authenticated) {
     return res.status(401).json({ error: 'Нет доступа' });
   }
 
   const { userId } = req.query;
-
   if (!userId) {
     return res.status(400).json({ error: 'Некорректный айди пользователя' });
   }

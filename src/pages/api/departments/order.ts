@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import createClient from '@/lib/postgre';
+import { isUserAuthenticated } from '@/lib/auth';
 
 export default async function handler(
   req: NextApiRequest,
@@ -9,8 +10,8 @@ export default async function handler(
     return res.status(405).json({ error: 'Метод не разрешен' });
 
   const supabase = createClient(req, res);
-  const token = req.cookies.authToken;
-  if (!token) {
+  const authenticated = isUserAuthenticated(req);
+  if (!authenticated) {
     return res.status(401).json({ error: 'Нет доступа' });
   }
 

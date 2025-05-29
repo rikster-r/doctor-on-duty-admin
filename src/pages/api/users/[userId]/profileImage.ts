@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import createClient from '@/lib/postgre';
 import formidable from 'formidable';
 import cloudinary from '@/lib/cloudinary';
+import { isUserAuthenticated } from '@/lib/auth';
 
 export const config = {
   api: {
@@ -14,8 +15,8 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const supabase = createClient(req, res);
-  const token = req.cookies.authToken;
-  if (!token) {
+  const authenticated = isUserAuthenticated(req);
+  if (!authenticated) {
     return res.status(401).json({ error: 'Нет доступа' });
   }
 

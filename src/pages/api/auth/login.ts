@@ -76,6 +76,7 @@ export default async function handler(
         role: user.role,
         created_at: user.created_at,
       },
+      token,
     });
   } catch (error) {
     console.error('Ошибка входа:', error);

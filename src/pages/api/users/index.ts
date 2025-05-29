@@ -1,9 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import createClient from '@/lib/postgre';
-import { getUserFromJwt } from '@/lib/getUserFromJWT';
 import { hash } from 'bcryptjs';
 import cloudinary from '@/lib/cloudinary';
 import formidable from 'formidable';
+import { getUserFromRequest} from '@/lib/auth';
 
 export const config = {
   api: {
@@ -16,17 +16,12 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const supabase = createClient(req, res);
-  const token = req.cookies.authToken;
-  if (!token) {
+  const user = getUserFromRequest(req);
+  if (!user) {
     return res.status(401).json({ error: 'Нет доступа' });
   }
 
   if (req.method === 'GET') {
-    const user = getUserFromJwt(token);
-    if (!user) {
-      return res.status(401).json({ error: 'Нет доступа' });
-    }
-
     const { page = '1', size = '10', search = '' } = req.query;
     const pageNum = parseInt(page as string);
     const pageSize = parseInt(size as string);
