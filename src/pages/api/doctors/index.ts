@@ -2,12 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import createClient from '@/lib/postgre';
 import { getUserFromRequest } from '@/lib/auth';
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -19,29 +13,15 @@ export default async function handler(
   }
 
   if (req.method === 'GET') {
-    const { page = '1', size = '50', search = '' } = req.query;
-    const pageNum = parseInt(page as string);
-    const pageSize = parseInt(size as string);
-
-    if (isNaN(pageNum) || isNaN(pageSize) || pageNum < 1 || pageSize < 1) {
-      return res
-        .status(400)
-        .json({ message: 'Некорректные параметры пагинации' });
-    }
-
-    const from = (pageNum - 1) * pageSize;
-    const to = from + pageSize - 1;
+    const { search = '' } = req.query;
 
     try {
       let query = supabase
         .from('users')
         .select(
-          '*, doctor_data:doctors!inner(specialization, department:departments(id, name))',
-          {
-            count: 'exact',
-          }
+          '*, doctor_data:doctors!inner(specialization, department:departments(id, name))'
         )
-        .order('created_at', { ascending: false })
+        .order('first_name', { ascending: true })
         .neq('id', user.id);
 
       if (search) {
@@ -51,20 +31,13 @@ export default async function handler(
         );
       }
 
-      const { data, count, error } = await query.range(from, to);
+      const { data, error } = await query;
 
       if (error) {
         throw new Error(error.message);
       }
 
-      const totalPages = Math.ceil((count || 0) / pageSize);
-
-      return res.status(200).json({
-        doctors: data || [],
-        currentPage: pageNum,
-        totalPages,
-        totalDoctors: count || 0,
-      });
+      return res.status(200).json(data || []);
     } catch (error) {
       console.error(error);
       return res
