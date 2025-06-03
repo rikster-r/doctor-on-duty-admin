@@ -13,25 +13,32 @@ export default async function handler(
   }
 
   if (req.method === 'GET') {
-    const { userId } = req.query;
+    const { from, to } = req.query;
 
     try {
-      const { data, count, error } = await supabase
+      const query = supabase
         .from('consultations')
         .select(
           `*, 
-          recipient:users!recipient_id (
-            id, first_name, last_name, photo_url
-          ),
-          requester:users!requester_id (
-            id, first_name, last_name, photo_url
-          )`,
-          {
-            count: 'exact',
-          }
+        recipient:users!recipient_id (
+          id, first_name, last_name, photo_url
+        ),
+        requester:users!requester_id (
+          id, first_name, last_name, photo_url
+        )`,
+          { count: 'exact' }
         )
-        .order('created_at', { ascending: false })
-        .eq('recipient.id', userId);
+        .order('created_at', { ascending: false });
+
+      if (from) {
+        query.eq('requester_id', from);
+      }
+
+      if (to) {
+        query.eq('recipient_id', to);
+      }
+
+      const { data, count, error } = await query;
 
       if (error) {
         throw new Error(error.message);
