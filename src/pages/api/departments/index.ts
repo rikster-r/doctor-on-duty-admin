@@ -72,21 +72,22 @@ export default async function handler(
           .json({ error: 'Название отделения обязательно' });
       }
 
-      if (!icon) {
-        return res.status(400).json({ error: 'Иконка отделения обязательно' });
-      }
+      let photo_url: string | null = null;
 
-      const imageData = await cloudinary.uploader.upload(icon.filepath, {
-        folder: 'doctoronduty/avatars',
-        resource_type: 'image',
-        public_id: icon.newFilename,
-      });
+      if (icon) {
+        const imageData = await cloudinary.uploader.upload(icon.filepath, {
+          folder: 'doctoronduty/avatars',
+          resource_type: 'image',
+          public_id: icon.newFilename,
+        });
+        photo_url = imageData.secure_url;
+      }
 
       const { data: department, error } = await supabase
         .from('departments')
         .insert({
           name,
-          photo_url: imageData.secure_url,
+          photo_url,
         })
         .select()
         .single();

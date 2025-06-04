@@ -93,7 +93,7 @@ const AddDepartmentModal = ({
         <button
           type="submit"
           className="w-full bg-blue-500 text-white font-semibold py-3 rounded-xl hover:bg-blue-600 transition disabled:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-gray-200"
-          disabled={!name || !file}
+          disabled={!name}
         >
           Добавить
         </button>
