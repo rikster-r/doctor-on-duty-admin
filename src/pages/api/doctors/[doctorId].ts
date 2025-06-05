@@ -8,7 +8,7 @@ export default async function handler(
 ) {
   const supabase = createClient(req, res);
   const user = getUserFromRequest(req);
-  
+
   if (!user) {
     return res.status(401).json({ error: 'Нет доступа' });
   }
@@ -24,7 +24,7 @@ export default async function handler(
       const { data, error } = await supabase
         .from('users')
         .select(
-          '*, doctor_data:doctors!inner(specialization, department:departments(id, name))'
+          '*, doctor_data:doctors(specialization, department:departments(id, name))'
         )
         .eq('id', doctorId)
         .single();

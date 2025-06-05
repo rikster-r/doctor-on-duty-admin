@@ -16,18 +16,29 @@ export default async function handler(
     const { search = '' } = req.query;
 
     try {
-      let query = supabase
+      const query = supabase
         .from('users')
         .select(
-          '*, doctor_data:doctors!inner(specialization, department:departments(id, name))'
+          '*, doctor_data:doctors(specialization, department:departments(id, name))'
         )
         .order('first_name', { ascending: true })
         .neq('id', user.id);
 
       if (search) {
-        const searchTerm = `%${(search as string).toLowerCase()}%`;
-        query = query.or(
-          `phone_number.ilike.${searchTerm},first_name.ilike.${searchTerm},last_name.ilike.${searchTerm}`
+        const searchTerms = (search as string)
+          .toLowerCase()
+          .split(' ')
+          .filter((term) => term.trim() !== '')
+          .map((term) => `%${term}%`);
+
+        query.or(
+          searchTerms
+            .map((term) =>
+              ['doctor_data.specialization', 'first_name', 'last_name']
+                .map((field) => `${field}.ilike.${term}`)
+                .join(',')
+            )
+            .join(',')
         );
       }
 

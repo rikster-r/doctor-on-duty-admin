@@ -3,7 +3,7 @@ import createClient from '@/lib/postgre';
 import { hash } from 'bcryptjs';
 import cloudinary from '@/lib/cloudinary';
 import formidable from 'formidable';
-import { getUserFromRequest} from '@/lib/auth';
+import { getUserFromRequest } from '@/lib/auth';
 
 export const config = {
   api: {
@@ -36,7 +36,7 @@ export default async function handler(
     const to = from + pageSize - 1;
 
     try {
-      let query = supabase
+      const query = supabase
         .from('users')
         .select(
           '*, doctor_data:doctors(specialization, department:departments(id, name))',
@@ -48,9 +48,20 @@ export default async function handler(
         .neq('id', user.id);
 
       if (search) {
-        const searchTerm = `%${(search as string).toLowerCase()}%`;
-        query = query.or(
-          `phone_number.ilike.${searchTerm},first_name.ilike.${searchTerm},last_name.ilike.${searchTerm}`
+        const searchTerms = (search as string)
+          .toLowerCase()
+          .split(' ')
+          .filter((term) => term.trim() !== '')
+          .map((term) => `%${term}%`);
+
+        query.or(
+          searchTerms
+            .map((term) =>
+              ['phone_number', 'first_name', 'last_name']
+                .map((field) => `${field}.ilike.${term}`)
+                .join(',')
+            )
+            .join(',')
         );
       }
 
