@@ -17,36 +17,44 @@ export default async function handler(
       const { consultationId } = req.query;
       const { action } = req.body;
 
-      let updateFields = {};
+      let updateFields: Record<string, string> = {};
+      const now = new Date().toISOString();
 
-      if (action === 'start') {
-        updateFields = {
-          status: 'in_progress',
-          started_at: new Date().toISOString(),
-        };
-      } else if (action === 'complete') {
-        // First, get the current consultation to check started_at
-        const { data: currentConsultation, error: fetchError } = await supabase
-          .from('consultations')
-          .select('started_at')
-          .eq('id', consultationId)
-          .single();
+      switch (action) {
+        case 'start_by_recipient':
+          updateFields = {
+            status: 'awaiting_requester_start_confirmation',
+            started_at: now,
+          };
+          break;
 
-        if (fetchError) {
-          throw new Error(fetchError.message);
-        }
+        case 'confirm_start':
+          updateFields = {
+            status: 'in_progress',
+            requester_start_confirmed_at: now,
+          };
+          break;
 
-        const currentDate = new Date().toISOString();
+        case 'finish_by_recipient':
+          updateFields = {
+            status: 'awaiting_requester_finish_confirmation',
+            recipient_finished_at: now,
+          };
+          break;
 
-        updateFields = {
-          status: 'completed',
-          started_at: currentConsultation.started_at ?? currentDate,
-          completed_at: currentDate,
-        };
-      } else {
-        return res
-          .status(400)
-          .json({ error: 'Разрешены только статусы "start" или "complete"' });
+        case 'confirm_finish':
+          updateFields = {
+            status: 'completed',
+            requester_finish_confirmed_at: now,
+            completed_at: now,
+          };
+          break;
+
+        default:
+          return res.status(400).json({
+            error:
+              'Разрешены только действия: start_by_recipient, confirm_start, finish_by_recipient, confirm_finish',
+          });
       }
 
       const { error } = await supabase
@@ -60,12 +68,13 @@ export default async function handler(
         throw new Error(error.message);
       }
 
-      res.status(200).json({ error: null });
+      return res.status(200).json({ error: null });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ message: 'Ошибка сервера', error: (error as Error).message });
+      return res.status(500).json({
+        message: 'Ошибка сервера',
+        error: (error as Error).message,
+      });
     }
   }
 
