@@ -22,22 +22,29 @@ export const getServerSideProps = (context: GetServerSidePropsContext) => {
 };
 
 function Users() {
-  const [searchTerm, setSearchTerm] = useState('');
   const { data: doctors, isLoading: isDoctorsLoading } = useSWR(
-    `/api/doctors?search=${encodeURIComponent(searchTerm)}`,
+    `/api/doctors`,
     fetcher
   );
   const [selectedDoctorId, setSelectedDoctorId] = useState<number | null>(
     doctors?.[0]?.id || null
   );
 
-  const { data: defaultSchedules, isLoading: isDefaultsLoading } = useSWR(
+  const {
+    data: defaultSchedules,
+    mutate: mutateDefaultSchedules,
+    isLoading: isDefaultsLoading,
+  } = useSWR(
     selectedDoctorId
       ? `/api/doctors/${selectedDoctorId}/schedules/defaults`
       : null,
     fetcher
   );
-  const { data: scheduleOverrides, isLoading: isOverridesLoading } = useSWR(
+  const {
+    data: scheduleOverrides,
+    mutate: mutateScheduleOverrides,
+    isLoading: isOverridesLoading,
+  } = useSWR(
     selectedDoctorId
       ? `/api/doctors/${selectedDoctorId}/schedules/overrides`
       : null,
@@ -58,7 +65,9 @@ function Users() {
       selectedDoctorId={selectedDoctorId}
       setSelectedDoctorId={setSelectedDoctorId}
       defaultSchedules={defaultSchedules}
+      mutateDefaultSchedules={mutateDefaultSchedules}
       scheduleOverrides={scheduleOverrides}
+      mutateScheduleOverrides={mutateScheduleOverrides}
       isLoading={isLoading}
     />
   );

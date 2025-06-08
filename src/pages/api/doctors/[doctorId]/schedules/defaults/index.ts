@@ -45,26 +45,37 @@ export default async function handler(
   }
 
   if (req.method === 'POST') {
-    const { day_of_week, start_time, end_time } = req.body;
+    const { day_of_week, is_day_off, start_time, end_time } = req.body;
 
-    if (!day_of_week || !start_time || !end_time) {
-      return res
-        .status(400)
-        .json({
-          error: 'Отсутствуют необходимые поля для создания расписания',
-        });
+    // allow either is_day_off or start_time and end_time
+    if (!day_of_week || (is_day_off && (start_time || end_time))) {
+      return res.status(400).json({
+        error: 'Отсутствуют необходимые поля для создания расписания',
+      });
     }
 
     try {
-      const { data, error } = await supabase
-        .from('default_schedules')
-        .insert([{ user_id: doctorId, day_of_week, start_time, end_time }])
-        .select()
-        .single();
+      if (is_day_off) {
+        const { data, error } = await supabase
+          .from('default_schedules')
+          .insert([{ user_id: doctorId, day_of_week, is_day_off }])
+          .select()
+          .single();
 
-      if (error) throw error;
+        if (error) throw error;
 
-      return res.status(201).json(data);
+        return res.status(201).json(data);
+      } else {
+        const { data, error } = await supabase
+          .from('default_schedules')
+          .insert([{ user_id: doctorId, day_of_week, start_time, end_time }])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        return res.status(201).json(data);
+      }
     } catch (error) {
       console.error(error);
       return res

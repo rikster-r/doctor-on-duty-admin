@@ -33,7 +33,8 @@ type DefaultSchedule = {
   user_id: number;
   start_time: string;
   end_time: string;
-  day_of_week: number;
+  day_of_week: string;
+  is_day_off: boolean;
   created_at: string;
   user?: User;
 };
