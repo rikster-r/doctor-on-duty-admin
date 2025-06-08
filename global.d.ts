@@ -27,3 +27,28 @@ type Department = {
   order: number;
   created_at: string;
 };
+
+type DefaultSchedule = {
+  id: number;
+  user_id: number;
+  start_time: string;
+  end_time: string;
+  day_of_week: number;
+  created_at: string;
+  user?: User;
+};
+
+type ScheduleOverride = {
+  id: number;
+  user_id: number;
+  start_time: string;
+  end_time: string;
+  date: string;
+  created_at: string;
+  user?: User;
+};
+
+type ScheduleTimes = {
+  start_time: string;
+  end_time: string;
+};
