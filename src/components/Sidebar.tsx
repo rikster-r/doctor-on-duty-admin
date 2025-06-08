@@ -1,4 +1,4 @@
-import { FirstAid, SignOut, UserCircle } from 'phosphor-react';
+import { FirstAid, SignOut, UserCircle, CalendarBlank } from 'phosphor-react';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -34,6 +34,17 @@ const Sidebar = () => {
         >
           <FirstAid size={20} weight="bold" />
           <span className="text-sm">Отделения</span>
+        </Link>
+        <Link
+          href="/schedules"
+          className={`${
+            router.pathname === '/schedules'
+              ? 'bg-blue-600 hover:bg-blue-500 text-white'
+              : 'hover:bg-blue-50'
+          } flex items-center gap-3 px-4 py-3 rounded-xl`}
+        >
+          <CalendarBlank size={20} weight="bold" />
+          <span className="text-sm">Графики</span>
         </Link>
         <button
           onClick={logout}

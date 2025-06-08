@@ -1,12 +1,5 @@
 import { useMemo, useState } from 'react';
-import {
-  UserCircle,
-  MagnifyingGlass,
-  Plus,
-  PencilSimple,
-  Trash,
-  NotePencil,
-} from 'phosphor-react';
+import { MagnifyingGlass, Plus, Trash, NotePencil } from 'phosphor-react';
 import Layout from './Layout';
 import { fetcher } from '@/lib/fetcher';
 import useSWR from 'swr';
@@ -14,10 +7,10 @@ import Pagination from './Pagination';
 import { toast } from 'react-toastify';
 import AddUserModal from './modals/AddUserModal';
 import EditUserModal from './modals/EditUserModal';
-import { CldImage } from 'next-cloudinary';
 import UserMenu from './UserMenu';
 import ChangePasswordModal from './modals/ChangePasswordModal';
 import ChangeImageModal from './modals/ChangeImageModal';
+import UserImage from './UserImage';
 
 const pageSize = 50;
 
@@ -161,37 +154,13 @@ export default function UsersDashboard() {
                       className="hover:bg-gray-50 transition-colors duration-150"
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800 flex gap-2 items-center">
-                        <div className="w-10 h-10 rounded-full relative group">
-                          {user.photo_url ? (
-                            <CldImage
-                              width="960"
-                              height="600"
-                              src={user.photo_url}
-                              alt=""
-                              className="rounded-full object-cover w-full h-full"
-                            />
-                          ) : (
-                            <UserCircle
-                              size={40}
-                              weight="thin"
-                              className="text-gray-500"
-                            />
-                          )}
-                          <button
-                            className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                            onClick={() => {
-                              setSelectedUser(user);
-                              setChangeImageModalOpen(true);
-                            }}
-                          >
-                            <PencilSimple
-                              size={18}
-                              weight="bold"
-                              className="text-white"
-                            />
-                          </button>
-                        </div>
-
+                        <UserImage
+                          photoUrl={user.photo_url}
+                          onEdit={() => {
+                            setSelectedUser(user);
+                            setChangeImageModalOpen(true);
+                          }}
+                        />
                         <span className="text-sm">
                           {user.first_name} {user.last_name}
                         </span>
