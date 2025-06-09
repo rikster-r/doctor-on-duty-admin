@@ -45,6 +45,7 @@ type ScheduleOverride = {
   start_time: string;
   end_time: string;
   date: string;
+  is_day_off: boolean;
   created_at: string;
   user?: User;
 };

@@ -8,26 +8,25 @@ type Props = {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   doctorId: number;
-  dayOfWeek: string;
-  onScheduleAdded: () => void;
+  date: string; // Format: YYYY-MM-DD
+  onOverrideAdded: () => void;
 };
 
-const daysOfWeekMap: Record<string, string> = {
-  monday: 'Понедельник',
-  tuesday: 'Вторник',
-  wednesday: 'Среда',
-  thursday: 'Четверг',
-  friday: 'Пятница',
-  saturday: 'Суббота',
-  sunday: 'Воскресенье',
+const formatDateToRussian = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 };
 
-const AddDefaultScheduleModal = ({
+const AddScheduleOverrideModal = ({
   isOpen,
   setIsOpen,
-  dayOfWeek,
   doctorId,
-  onScheduleAdded,
+  date,
+  onOverrideAdded,
 }: Props) => {
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
@@ -38,29 +37,31 @@ const AddDefaultScheduleModal = ({
     setIsSubmitting(true);
 
     try {
-      const res = await fetch(`/api/doctors/${doctorId}/schedules/defaults`, {
+      const res = await fetch(`/api/doctors/${doctorId}/schedules/overrides`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          day_of_week: dayOfWeek,
+          date,
           start_time: startTime,
           end_time: endTime,
         }),
       });
 
       if (res.ok) {
-        toast.success('График успешно добавлен');
+        toast.success(
+          `График доктора на ${formatDateToRussian(date)} успешно изменен`
+        );
         setStartTime('');
         setEndTime('');
         setIsOpen(false);
-        onScheduleAdded();
+        onOverrideAdded();
       } else {
         const data = await res.json();
-        toast.error(data.error || 'Ошибка при добавлении графика');
+        toast.error(data.error || 'Ошибка при добавлении переопределения');
       }
     } catch (error) {
       console.error(error);
-      toast.error('Ошибка при добавлении графика');
+      toast.error('Ошибка при добавлении переопределения');
     } finally {
       setIsSubmitting(false);
     }
@@ -78,7 +79,7 @@ const AddDefaultScheduleModal = ({
         <div className="flex justify-between items-center mb-4">
           <CaretLeft className="invisible" size={20} />
           <DialogTitle className="text-base font-bold text-center text-gray-800">
-            Добавить базовый график
+            Изменить график на дату
           </DialogTitle>
           <button onClick={handleClose} type="button">
             <X size={20} />
@@ -87,10 +88,10 @@ const AddDefaultScheduleModal = ({
 
         <div className="mb-4">
           <label className="block font-medium mb-1 text-sm text-gray-700">
-            День недели
+            Дата
           </label>
           <div className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700">
-            {daysOfWeekMap[dayOfWeek] || dayOfWeek}
+            {formatDateToRussian(date)}
           </div>
         </div>
 
@@ -144,4 +145,4 @@ const AddDefaultScheduleModal = ({
   );
 };
 
-export default AddDefaultScheduleModal;
+export default AddScheduleOverrideModal;
