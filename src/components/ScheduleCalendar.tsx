@@ -7,7 +7,12 @@ import {
   ArrowUUpLeft,
   CalendarX,
 } from 'phosphor-react';
-import { Popover, PopoverPanel, PopoverButton, CloseButton } from '@headlessui/react';
+import {
+  Popover,
+  PopoverPanel,
+  PopoverButton,
+  CloseButton,
+} from '@headlessui/react';
 import AddScheduleOverrideModal from './modals/AddScheduleOverrideModal';
 import { toast } from 'react-toastify';
 
@@ -215,54 +220,54 @@ const ScheduleCalendar: React.FC<Props> = ({
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className="bg-white rounded-lg shadow-md">
         {/* Calendar Header */}
-        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+        <div className="px-2 sm:px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row items-center justify-between">
           <div className="flex items-center space-x-4">
             <button
               onClick={handlePrevMonth}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             >
-              <CaretLeft className="w-5 h-5 text-gray-600" />
+              <CaretLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             </button>
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 w-[150px] text-center">
               {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
             </h2>
             <button
               onClick={handleNextMonth}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             >
-              <CaretRight className="w-5 h-5 text-gray-600" />
+              <CaretRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             </button>
           </div>
 
           {/* Legend */}
           <div>
-            <div className="flex items-center justify-center space-x-6 text-sm text-gray-600">
-              <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-evenly space-x-3 sm:space-x-6 text-xs sm:text-sm text-gray-600 mt-4 sm:mt-0">
+              <div className="flex items-center space-x-1 sm:space-x-2">
                 <div className="w-3 h-3 bg-blue-100 border border-blue-300 rounded-full"></div>
-                <span>Базовый</span>
+                <span className="w-max">Базовый</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-orange-100 border border-orange-300 rounded-full"></div>
-                <span>Изменение графика</span>
+                <span className="w-max">Изменение графика</span>
               </div>
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-gray-100 border border-gray-300 rounded-full"></div>
-                <span>Выходной</span>
+                <span className="w-max">Выходной</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Calendar Grid */}
-        <div className="p-6">
+        <div className="p-1 sm:p-6">
           {/* Day Headers */}
           <div className="grid grid-cols-7 gap-1 mb-3">
             {dayNames.map((day) => (
               <div
                 key={day}
-                className="p-3 text-center text-sm font-medium text-gray-500"
+                className="p-1 text-center text-sm font-medium text-gray-500"
               >
                 {day}
               </div>
@@ -282,7 +287,7 @@ const ScheduleCalendar: React.FC<Props> = ({
                   <PopoverButton
                     onClick={() => handleDateClick(date)}
                     className={`
-                  w-full p-3 h-20 rounded-lg text-left transition-all duration-200 relative  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
+                  w-full p-1 lg:p-3 min-h-20 rounded-lg text-left transition-all duration-200 relative focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
                   ${
                     !isCurrentMonth
                       ? 'text-gray-300 bg-gray-50 hover:bg-gray-100'
@@ -302,20 +307,23 @@ const ScheduleCalendar: React.FC<Props> = ({
                     {isCurrentMonth && scheduleInfo.schedule && (
                       <div className="text-xs space-y-1">
                         <div
-                          className={`${scheduleClasses} py-0.5 px-2 flex items-center space-x-1 text-gray-600 text-xs rounded-full`}
+                          className={`${scheduleClasses} py-0.5 px-0.5 sm:px-2 flex items-center  justify-center space-x-1 text-gray-600 text-xs rounded-md sm:rounded-full truncate`}
                         >
                           {scheduleInfo.schedule.is_day_off ? (
-                            <div className="px-2 py-0.5 rounded-full text-xs font-medium">
+                            <div className="rounded-full text-xs font-medium">
                               Выходной
                             </div>
                           ) : (
-                            <>
-                              <Clock className="w-3 h-3" />
+                            <div className="flex flex-col sm:flex-row items-center">
+                              <Clock className="w-3 h-3 hidden md:block md:mr-0.5" />
                               <span className="text-xs">
-                                {formatTime(scheduleInfo.schedule.start_time)}-
+                                {formatTime(scheduleInfo.schedule.start_time)}
+                              </span>
+                              <span className="text-center">-</span>
+                              <span className="text-xs">
                                 {formatTime(scheduleInfo.schedule.end_time)}
                               </span>
-                            </>
+                            </div>
                           )}
                         </div>
                       </div>

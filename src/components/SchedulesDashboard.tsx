@@ -31,7 +31,7 @@ const ScheduleControlPage = ({
 
   return (
     <Layout title="Панель графиков" description="Управление графиками врачей">
-      <main className="p-4 max-w-[1100px] mx-auto w-full">
+      <main className="p-4 max-w-[1000px] mx-auto w-full">
         <div className="flex flex-col sm:flex-row mb-6">
           <div className="mb-4 mr-4 sm:mb-0 sm:mr-auto">
             <h1 className="text-lg font-semibold">Панель графиков</h1>
