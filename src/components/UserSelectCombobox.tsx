@@ -11,7 +11,7 @@ import { Fragment, useState } from 'react';
 import UserImage from './UserImage';
 
 type Props = {
-  doctors: User[];
+  doctors: User[] | undefined;
   selectedDoctorId: number | null;
   onDoctorChange: (doctorId: number | null) => void;
   isLoading?: boolean;

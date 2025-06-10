@@ -17,18 +17,39 @@ export const getServerSideProps = (context: GetServerSidePropsContext) => {
   }
 
   return {
-    props: {},
+    props: {
+      initialDoctorId:
+        context.query.doctorId === undefined
+          ? null
+          : (context.query.doctorId as string),
+    },
   };
 };
 
-function Users() {
-  const { data: doctors, isLoading: isDoctorsLoading } = useSWR(
+type Props = {
+  initialDoctorId: string | null;
+};
+
+function Users({ initialDoctorId }: Props) {
+  const { data: doctors, isLoading: isDoctorsLoading } = useSWR<User[]>(
     `/api/doctors`,
     fetcher
   );
-  const [selectedDoctorId, setSelectedDoctorId] = useState<number | null>(
-    doctors?.[0]?.id || null
-  );
+
+  const [selectedDoctorId, setSelectedDoctorId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (doctors && doctors.length > 0) {
+      const initialId = Number(initialDoctorId);
+      const isValidId = doctors.some((doc) => doc.id === initialId);
+
+      if (initialDoctorId && isValidId) {
+        setSelectedDoctorId(initialId);
+      } else {
+        setSelectedDoctorId(doctors[0].id);
+      }
+    }
+  }, [doctors, initialDoctorId]);
 
   const {
     data: defaultSchedules,
@@ -50,12 +71,6 @@ function Users() {
       : null,
     fetcher
   );
-
-  useEffect(() => {
-    if (doctors && doctors.length > 0) {
-      setSelectedDoctorId(doctors[0].id);
-    }
-  }, [doctors]);
 
   const isLoading = isDefaultsLoading || isOverridesLoading || isDoctorsLoading;
 

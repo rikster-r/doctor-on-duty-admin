@@ -10,7 +10,10 @@ const UserMenu = ({ openChangePasswordModal, openChangeImageModal }: Props) => {
   return (
     <>
       <Menu as="div" className="relative inline-block text-left">
-        <MenuButton className="flex items-center justify-center">
+        <MenuButton
+          className="flex items-center justify-center"
+          title="Открыть меню изменения данных"
+        >
           <DotsThreeVertical
             className=""
             aria-hidden="true"

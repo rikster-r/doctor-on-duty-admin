@@ -5,7 +5,7 @@ import DefaultSchedulesControl from './DefaultSchedulesControl';
 import ScheduleCalendar from './ScheduleCalendar';
 
 type Props = {
-  doctors: User[];
+  doctors: User[] | undefined;
   selectedDoctorId: number | null;
   setSelectedDoctorId: React.Dispatch<React.SetStateAction<number | null>>;
   defaultSchedules: DefaultSchedule[] | null;

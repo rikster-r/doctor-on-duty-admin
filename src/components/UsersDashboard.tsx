@@ -1,5 +1,11 @@
 import { useMemo, useState } from 'react';
-import { MagnifyingGlass, Plus, Trash, NotePencil } from 'phosphor-react';
+import {
+  MagnifyingGlass,
+  Plus,
+  Trash,
+  NotePencil,
+  Share,
+} from 'phosphor-react';
 import Layout from './Layout';
 import { fetcher } from '@/lib/fetcher';
 import useSWR from 'swr';
@@ -11,6 +17,7 @@ import UserMenu from './UserMenu';
 import ChangePasswordModal from './modals/ChangePasswordModal';
 import ChangeImageModal from './modals/ChangeImageModal';
 import UserImage from './UserImage';
+import { useRouter } from 'next/router';
 
 const pageSize = 50;
 
@@ -36,6 +43,8 @@ export default function UsersDashboard() {
     `/api/departments`,
     fetcher
   );
+
+  const router = useRouter();
 
   const [addUserModalOpen, setAddUserModalOpen] = useState(false);
   const [editUserModalOpen, setEditUserModalOpen] = useState(false);
@@ -139,7 +148,7 @@ export default function UsersDashboard() {
                     <th className="px-6 py-3 text-left text-xs font-medium tracking-tight">
                       Специализация
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium tracking-tight">
+                    <th className="px-6 py-3 text-center text-xs font-medium tracking-tight">
                       График
                     </th>
                     <th className="px-6 py-3 text-center text-xs font-medium tracking-tight">
@@ -181,7 +190,18 @@ export default function UsersDashboard() {
                           ? user.doctor_data.specialization
                           : '-'}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-sm"></td>
+                      <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-sm text-center">
+                        <button
+                          aria-label="Редактировать пользователя"
+                          className="text-blue-500 hover:text-blue-700 transition-colors duration-150 text-center"
+                          onClick={() => {
+                            router.push(`/schedules?doctorId=${user.id}`);
+                          }}
+                          title="Открыть страницу графика пользователя"
+                        >
+                          <Share size={18} weight="bold" />
+                        </button>
+                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center">
                         <div className="flex items-center justify-center gap-3">
                           <button
@@ -191,6 +211,7 @@ export default function UsersDashboard() {
                               setSelectedUser(user);
                               setEditUserModalOpen(true);
                             }}
+                            title="Изменить обязательные данные пользователя"
                           >
                             <NotePencil size={18} weight="bold" />
                           </button>
@@ -198,6 +219,7 @@ export default function UsersDashboard() {
                             aria-label="Удалить пользователя"
                             className="text-red-500 hover:text-red-700 transition-colors duration-150"
                             onClick={() => deleteUser(user.id)}
+                            title="Удалить пользователя"
                           >
                             <Trash size={18} weight="bold" />
                           </button>
