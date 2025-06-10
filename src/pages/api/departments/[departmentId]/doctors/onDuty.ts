@@ -36,7 +36,7 @@ export default async function handler(
       .select(
         '*, doctor_data:doctors(specialization, department:departments(id, name))'
       )
-      .eq('doctor_data.department', departmentId);
+      .eq('doctor_data.department.id', departmentId);
 
     if (doctorError) {
       throw new Error(doctorError.message);
