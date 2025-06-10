@@ -21,28 +21,28 @@ export default async function handler(
         .select(
           '*, doctor_data:doctors(specialization, department:departments(id, name))'
         )
-        .order('first_name', { ascending: true })
         .neq('id', user.id);
 
       if (search) {
         const searchTerms = (search as string)
           .toLowerCase()
           .split(' ')
-          .filter((term) => term.trim() !== '')
-          .map((term) => `%${term}%`);
+          .filter((term) => term.trim() !== '');
 
         query.or(
           searchTerms
             .map((term) =>
-              ['doctor_data.specialization', 'first_name', 'last_name']
-                .map((field) => `${field}.ilike.${term}`)
+              ['first_name', 'last_name']
+                .map((field) => `${field}.ilike.%${term}%`)
                 .join(',')
             )
             .join(',')
         );
       }
 
-      const { data, error } = await query;
+      const { data, error } = await query.order('first_name', {
+        ascending: true,
+      });
 
       if (error) {
         throw new Error(error.message);
