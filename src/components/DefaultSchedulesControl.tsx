@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { Plus, X, Moon } from 'phosphor-react';
+import { Plus, X, Moon, Clock, PencilSimple } from 'phosphor-react';
+import {
+  Popover,
+  PopoverPanel,
+  PopoverButton,
+  CloseButton,
+} from '@headlessui/react';
 import { toast } from 'react-toastify';
 import AddDefaultScheduleModal from './modals/AddDefaultScheduleModal';
 
@@ -10,13 +16,13 @@ type Props = {
 };
 
 const daysOfWeek = [
-  { id: 'monday', text: 'Пн' },
-  { id: 'tuesday', text: 'Вт' },
-  { id: 'wednesday', text: 'Ср' },
-  { id: 'thursday', text: 'Чт' },
-  { id: 'friday', text: 'Пт' },
-  { id: 'saturday', text: 'Сб' },
-  { id: 'sunday', text: 'Вс' },
+  { id: 'monday', text: 'Понедельник', short: 'Пн' },
+  { id: 'tuesday', text: 'Вторник', short: 'Вт' },
+  { id: 'wednesday', text: 'Среда', short: 'Ср' },
+  { id: 'thursday', text: 'Четверг', short: 'Чт' },
+  { id: 'friday', text: 'Пятница', short: 'Пт' },
+  { id: 'saturday', text: 'Суббота', short: 'Сб' },
+  { id: 'sunday', text: 'Воскресенье', short: 'Вс' },
 ];
 
 export default function DefaultSchedulesGrid({
@@ -72,83 +78,142 @@ export default function DefaultSchedulesGrid({
     }
   };
 
+  const formatTime = (time: string) => {
+    return time.slice(0, 5);
+  };
+
   return (
     <>
-      <div className="mt-10">
-        <div className="flex sm:flex-col gap-1">
-          <div className="flex flex-col sm:flex-row sm:justify-around items-center">
-            {daysOfWeek.map(({ id, text }) => (
-              <div
-                key={id}
-                className="font-semibold text-gray-700 text-center p-2 h-[calc(100%/7)] flex items-center sm:"
-              >
-                {text}
-              </div>
-            ))}
-          </div>
+      <div className="bg-white rounded-lg shadow-md">
+        {/* Header */}
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">
+            Базовый график работы
+          </h3>
+          <p className="text-sm text-gray-600 mt-1">
+            Настройте стандартное расписание для каждого дня недели
+          </p>
+        </div>
 
-          <div className="flex flex-col sm:flex-row w-full">
+        {/* Schedule Grid */}
+        <div className="p-4 sm:p-6">
+          <div className="space-y-3">
             {daysOfWeek.map((day) => {
               const schedule = defaultSchedules.find(
                 (s) => s.day_of_week === day.id
               );
+
               return (
                 <div
                   key={day.id}
-                  className="py-3 px-1 border border-gray-200 text-center h-[calc(100%/7)] sm:min-h-[70px] flex items-center justify-center w-full"
+                  className="flex items-center justify-between px-3 py-4 sm:p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
                 >
-                  {schedule ? (
-                    <div
-                      className={`bg-opacity-20 rounded cursor-pointer hover:bg-opacity-30 transition-colors relative group w-full ${
-                        schedule.is_day_off
-                          ? 'bg-gray-300 text-gray-600'
-                          : 'bg-blue-200 text-blue-800'
-                      }`}
-                    >
-                      {schedule.is_day_off ? (
-                        <div className="flex items-center justify-center p-2">
-                          <Moon size={14} className="mr-1" />
-                          <span className="text-xs font-medium">Выходной</span>
-                        </div>
-                      ) : (
-                        <div className="p-2 text-xs font-medium flex justify-center text-center">
-                          <span>{schedule.start_time.slice(0, 5)}</span>-
-                          <span>{schedule.end_time.slice(0, 5)}</span>
-                        </div>
-                      )}
-                      <div className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteDefaultSchedule(schedule.id);
-                          }}
-                          className="text-red-500 hover:text-red-700 bg-white rounded-full p-1 shadow-sm"
-                        >
-                          <X size={14} />
-                        </button>
+                  {/* Day Name */}
+                  <div className="flex items-center space-x-1 sm:space-x-3 min-w-0 flex-1">
+                    <div className="w-8 h-8 bg-gray-100 aspect-square rounded-full flex items-center justify-center">
+                      <span className="text-xs sm:text-sm font-medium text-gray-600">
+                        {day.short}
+                      </span>
+                    </div>
+                    <div>
+                      <div className="text-sm sm:text-base font-medium text-gray-900">
+                        {day.text}
                       </div>
                     </div>
-                  ) : (
-                    <div className="w-full h-full min-h-12 flex">
-                      <button
-                        onClick={() => {
-                          setSelectedDayOfWeek(day.id);
-                          setAddDefaultScheduleModalOpen(true);
-                        }}
-                        className="flex-1 border-2 border-dashed border-gray-300 rounded hover:border-blue-400 flex items-center justify-center text-gray-400 hover:text-blue-600 transition-colors mr-1"
-                        title="Добавить время работы"
-                      >
-                        <Plus size={14} />
-                      </button>
-                      <button
-                        onClick={() => setDayOff(day.id)}
-                        className="w-8 border-2 border-dashed border-gray-300 rounded hover:border-gray-400 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
-                        title="Выходной день"
-                      >
-                        <Moon size={12} />
-                      </button>
-                    </div>
-                  )}
+                  </div>
+
+                  {/* Schedule Info */}
+                  <div className="flex items-center space-x-3">
+                    {schedule ? (
+                      <Popover className="relative">
+                        <PopoverButton
+                          className={`px-3 py-2 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-50 ${
+                            schedule.is_day_off
+                              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-gray-500'
+                              : 'bg-blue-100 text-blue-700 hover:bg-blue-200 focus:ring-blue-500'
+                          }`}
+                        >
+                          {schedule.is_day_off ? (
+                            <div className="flex items-center space-x-2">
+                              <Moon className="w-4 h-4" />
+                              <span>Выходной</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center space-x-2">
+                              <Clock className="w-4 h-4" />
+                              <span>
+                                {formatTime(schedule.start_time)} -{' '}
+                                {formatTime(schedule.end_time)}
+                              </span>
+                            </div>
+                          )}
+                        </PopoverButton>
+
+                        <PopoverPanel
+                          className="absolute z-10 mt-1 w-60 rounded-lg shadow-lg bg-white border border-gray-300 overflow-hidden ring-1 ring-black ring-opacity-5"
+                          anchor={{
+                            to: 'bottom end',
+                            gap: 8,
+                          }}
+                        >
+                          <div className="p-2 space-y-1">
+                            <CloseButton
+                              onClick={() => {
+                                setSelectedDayOfWeek(day.id);
+                                setAddDefaultScheduleModalOpen(true);
+                              }}
+                              className="w-full px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 rounded-lg transition-colors flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                            >
+                              <PencilSimple className="w-4 h-4" />
+                              <span>Изменить график</span>
+                            </CloseButton>
+
+                            {!schedule.is_day_off && (
+                              <CloseButton
+                                onClick={() => setDayOff(day.id)}
+                                className="w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                              >
+                                <Moon className="w-4 h-4" />
+                                <span>Сделать выходным</span>
+                              </CloseButton>
+                            )}
+
+                            <CloseButton
+                              onClick={() => deleteDefaultSchedule(schedule.id)}
+                              className="w-full px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50"
+                            >
+                              <X className="w-4 h-4" />
+                              <span>Удалить график</span>
+                            </CloseButton>
+                          </div>
+                        </PopoverPanel>
+                      </Popover>
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => {
+                            setSelectedDayOfWeek(day.id);
+                            setAddDefaultScheduleModalOpen(true);
+                          }}
+                          className="text-center px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 flex items-center text-gray-500 hover:text-blue-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+                          title="Добавить базовый график"
+                        >
+                          <Plus className="w-4 h-4" />
+                          <span className="text-sm font-medium hidden sm:block sm:ml-2">
+                            Добавить время
+                          </span>
+                        </button>
+
+                        <button
+                          onClick={() => setDayOff(day.id)}
+                          className="px-3 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 hover:bg-gray-50 flex items-center text-gray-500 hover:text-gray-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50"
+                          title="Выходной день"
+                        >
+                          <Moon className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}

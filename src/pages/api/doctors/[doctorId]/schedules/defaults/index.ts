@@ -58,7 +58,10 @@ export default async function handler(
       if (is_day_off) {
         const { data, error } = await supabase
           .from('default_schedules')
-          .insert([{ user_id: doctorId, day_of_week, is_day_off }])
+          .upsert([{ user_id: doctorId, day_of_week, is_day_off }], {
+            onConflict: 'user_id,day_of_week',
+            ignoreDuplicates: false,
+          })
           .select()
           .single();
 
@@ -68,7 +71,10 @@ export default async function handler(
       } else {
         const { data, error } = await supabase
           .from('default_schedules')
-          .insert([{ user_id: doctorId, day_of_week, start_time, end_time }])
+          .upsert([{ user_id: doctorId, day_of_week, start_time, end_time }], {
+            onConflict: 'user_id,day_of_week',
+            ignoreDuplicates: false,
+          })
           .select()
           .single();
 

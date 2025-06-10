@@ -26,12 +26,16 @@ const ScheduleControlPage = ({
   isLoading,
 }: Props) => {
   const [activeTab, setActiveTab] = useState<'calendar' | 'schedules'>(
-    'calendar'
+    'schedules'
   );
 
   return (
     <Layout title="Панель графиков" description="Управление графиками врачей">
-      <main className="p-4 max-w-[1000px] mx-auto w-full">
+      <main
+        className={`${
+          activeTab === 'calendar' ? 'max-w-[1100px]' : 'max-w-[800px]'
+        } p-4 mx-auto w-full`}
+      >
         <div className="flex flex-col sm:flex-row mb-6">
           <div className="mb-4 mr-4 sm:mb-0 sm:mr-auto">
             <h1 className="text-lg font-semibold">Панель графиков</h1>
@@ -51,16 +55,6 @@ const ScheduleControlPage = ({
         {/* Tab Navigation */}
         <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg w-fit">
           <button
-            onClick={() => setActiveTab('calendar')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'calendar'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Календарь
-          </button>
-          <button
             onClick={() => setActiveTab('schedules')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               activeTab === 'schedules'
@@ -69,6 +63,16 @@ const ScheduleControlPage = ({
             }`}
           >
             Базовые графики
+          </button>
+          <button
+            onClick={() => setActiveTab('calendar')}
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+              activeTab === 'calendar'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Календарь
           </button>
         </div>
 

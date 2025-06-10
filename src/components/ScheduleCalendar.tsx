@@ -5,7 +5,7 @@ import {
   Clock,
   PencilSimple,
   ArrowUUpLeft,
-  CalendarX,
+  Moon,
 } from 'phosphor-react';
 import {
   Popover,
@@ -221,6 +221,16 @@ const ScheduleCalendar: React.FC<Props> = ({
   return (
     <>
       <div className="bg-white rounded-lg shadow-md">
+        {/* Header */}
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-semibold text-gray-900">
+            Календарь расписания
+          </h3>
+          <p className="text-sm text-gray-600 mt-1">
+            Управляйте изменениями в расписании для конкретных дат
+          </p>
+        </div>
+
         {/* Calendar Header */}
         <div className="px-2 sm:px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -300,17 +310,17 @@ const ScheduleCalendar: React.FC<Props> = ({
                   }
                 `}
                   >
-                    <div className="font-medium text-sm mb-1 ">
+                    <div className="font-medium text-sm mb-auto ">
                       {date.getDate()}
                     </div>
 
-                    {isCurrentMonth && scheduleInfo.schedule && (
-                      <div className="text-xs space-y-1">
+                    <div className="text-xs space-y-1 min-h-[48px] sm:min-h-[20px]">
+                      {isCurrentMonth && scheduleInfo.schedule && (
                         <div
-                          className={`${scheduleClasses} py-0.5 px-0.5 sm:px-2 flex items-center  justify-center space-x-1 text-gray-600 text-xs rounded-md sm:rounded-full truncate`}
+                          className={`${scheduleClasses} py-0.5 px-0.5 sm:px-2 flex items-center justify-center space-x-1 text-gray-600 text-xs rounded-md sm:rounded-full`}
                         >
                           {scheduleInfo.schedule.is_day_off ? (
-                            <div className="rounded-full text-xs font-medium">
+                            <div className="rounded-full text-xs font-medium truncate flex">
                               Выходной
                             </div>
                           ) : (
@@ -326,8 +336,8 @@ const ScheduleCalendar: React.FC<Props> = ({
                             </div>
                           )}
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </PopoverButton>
                   <PopoverPanel
                     className="absolute z-10 mt-1 w-60 rounded-lg shadow-lg bg-white border border-gray-300 overflow-hidden ring-1 ring-black ring-opacity-5"
@@ -354,7 +364,7 @@ const ScheduleCalendar: React.FC<Props> = ({
                           }}
                           className="w-full px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 rounded-lg transition-colors flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                         >
-                          <CalendarX className="w-4 h-4" />
+                          <Moon className="w-4 h-4" />
                           <span>Установить выходной</span>
                         </CloseButton>
                       )}
