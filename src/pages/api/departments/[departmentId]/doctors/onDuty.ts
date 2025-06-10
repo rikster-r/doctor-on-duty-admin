@@ -48,19 +48,31 @@ export default async function handler(
 
     const userIds = doctors.map((doc) => doc.id);
 
-    // Step 2: Get overrides for today
-    const { data: overrides } = await supabase
-      .from('schedule_overrides')
-      .select('*')
-      .eq('date', dateStr)
-      .in('user_id', userIds);
+    // Step 2 & 3: Get overrides and default schedules in parallel
+    const [
+      { data: overrides, error: overridesError },
+      { data: defaults, error: defaultsError },
+    ] = await Promise.all([
+      supabase
+        .from('schedule_overrides')
+        .select('*')
+        .in('user_id', userIds)
+        .eq('date', dateStr),
+      supabase
+        .from('default_schedules')
+        .select('*')
+        .in('user_id', userIds)
+        .eq('day_of_week', weekday)
+        .neq('is_day_off', true),
+    ]);
 
-    // Step 3: Get default schedules for today
-    const { data: defaults } = await supabase
-      .from('default_schedules')
-      .select('*')
-      .eq('day_of_week', weekday)
-      .in('user_id', userIds);
+    if (!defaults || defaultsError) {
+      throw new Error(defaultsError.message);
+    }
+
+    if (!overrides || overridesError) {
+      throw new Error(overridesError.message);
+    }
 
     // Step 4: Mark users who are working today
     const workingToday = new Map<
@@ -68,12 +80,17 @@ export default async function handler(
       { start_time: string; end_time: string }
     >();
 
-    overrides?.forEach(({ user_id, start_time, end_time }) => {
-      workingToday.set(user_id, { start_time, end_time });
+    // supabase query doesn't include day_offs automatically
+    defaults.forEach(({ user_id, start_time, end_time }) => {
+      if (!workingToday.has(user_id)) {
+        workingToday.set(user_id, { start_time, end_time });
+      }
     });
 
-    defaults?.forEach(({ user_id, start_time, end_time }) => {
-      if (!workingToday.has(user_id)) {
+    overrides.forEach(({ user_id, is_day_off, start_time, end_time }) => {
+      if (is_day_off) {
+        workingToday.delete(user_id);
+      } else {
         workingToday.set(user_id, { start_time, end_time });
       }
     });
