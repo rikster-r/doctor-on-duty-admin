@@ -54,3 +54,7 @@ type ScheduleTimes = {
   start_time: string;
   end_time: string;
 };
+
+type UserWithSchedule = User & {
+  schedule: ScheduleTimes
+}
