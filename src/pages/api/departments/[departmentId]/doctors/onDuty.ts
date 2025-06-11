@@ -17,15 +17,39 @@ export default async function handler(
     return res.status(405).json({ error: 'Метод не поддерживается' });
   }
 
-  const { departmentId } = req.query;
+  const { departmentId, date } = req.query;
 
   if (!departmentId) {
     return res.status(400).json({ error: 'Отсутствует departmentId' });
   }
 
-  const today = new Date();
-  const dateStr = today.toISOString().split('T')[0]; // 'YYYY-MM-DD'
-  const weekday = today
+  // Use provided date or default to today
+  let targetDate: Date;
+  let dateStr: string;
+
+  if (date && typeof date === 'string') {
+    // Validate date format (YYYY-MM-DD)
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(date)) {
+      return res
+        .status(400)
+        .json({ error: 'Неверный формат даты. Используйте YYYY-MM-DD' });
+    }
+
+    targetDate = new Date(date);
+
+    // Check if date is valid
+    if (isNaN(targetDate.getTime())) {
+      return res.status(400).json({ error: 'Неверная дата' });
+    }
+
+    dateStr = date;
+  } else {
+    targetDate = new Date();
+    dateStr = targetDate.toISOString().split('T')[0]; // 'YYYY-MM-DD'
+  }
+
+  const weekday = targetDate
     .toLocaleDateString('en-US', { weekday: 'long' })
     .toLowerCase(); // e.g. 'monday'
 
@@ -82,9 +106,7 @@ export default async function handler(
 
     // supabase query doesn't include day_offs automatically
     defaults.forEach(({ user_id, start_time, end_time }) => {
-      if (!workingToday.has(user_id)) {
-        workingToday.set(user_id, { start_time, end_time });
-      }
+      workingToday.set(user_id, { start_time, end_time });
     });
 
     overrides.forEach(({ user_id, is_day_off, start_time, end_time }) => {
