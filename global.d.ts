@@ -58,3 +58,26 @@ type ScheduleTimes = {
 type UserWithSchedule = User & {
   schedule: ScheduleTimes
 }
+
+type NotificationPushToken = {
+  id: number;
+  user_id: number;
+  push_token: string;
+  device_type: string;
+  deviceName: string;
+  is_active: boolean;
+  created_at: string;
+};
+
+type PushNotification = {
+  id: number;
+  consultation_id: number;
+  title: string;
+  body: string;
+  type: string;
+  is_read: boolean;
+  is_sent: boolean;
+  sent_at: string;
+  read_at: string;
+  created_at: string;
+};

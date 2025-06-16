@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import createClient from '@/lib/postgre';
 import { getUserFromRequest } from '@/lib/auth';
+import { sendNotificationToUser } from '@/lib/notifications';
 
 export default async function handler(
   req: NextApiRequest,
@@ -78,6 +79,7 @@ export default async function handler(
     }
 
     try {
+      // Step 1: Create consultation
       const { error } = await supabase.from('consultations').insert([
         {
           recipient_id,
@@ -92,6 +94,33 @@ export default async function handler(
 
       if (error) {
         throw new Error(error.message);
+      }
+
+      // Step 2: Send notification to user (don't let this fail the creation)
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('first_name, last_name')
+          .eq('id', recipient_id)
+          .single();
+
+        if (error) {
+          throw error;
+        }
+
+        await sendNotificationToUser(supabase, recipient_id, {
+          title: `${
+            data.first_name.charAt(0).toUpperCase() + data.first_name.slice(1)
+          } ${
+            data.last_name.charAt(0).toUpperCase() + data.last_name.slice(1)
+          } отправил заявку на консультацию`,
+          body: `${reason}`,
+        });
+      } catch (notificationError) {
+        console.error(
+          '❌ Ошибка отправки уведомления консультации:',
+          notificationError
+        );
       }
 
       return res.status(200).json({
