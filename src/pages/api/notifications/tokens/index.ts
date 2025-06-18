@@ -16,17 +16,17 @@ export default async function handler(
   
   if (req.method === 'POST') {
     try {
-      const { user_id, push_token, device_type, device_name } = req.body;
+      const { user_id, token, device_type, device_name } = req.body;
       
       // Validate required fields
-      if (!user_id || !push_token || !device_type || !device_name) {
+      if (!user_id || !token || !device_type || !device_name) {
         return res.status(400).json({
-          error: 'Отсутствуют обязательные поля: user_id, push_token, device_type или device_name',
+          error: 'Отсутствуют обязательные поля: user_id, token, device_type или device_name',
         });
       }
       
       // Validate the push token format
-      if (!Expo.isExpoPushToken(push_token)) {
+      if (!Expo.isExpoPushToken(token)) {
         return res.status(400).json({
           error: 'Неверный формат push токена',
         });
@@ -36,7 +36,7 @@ export default async function handler(
       const { error } = await supabase.from('notification_push_tokens').insert([
         {
           user_id,
-          token: push_token,
+          token,
           device_type,
           device_name,
           is_active: true,
