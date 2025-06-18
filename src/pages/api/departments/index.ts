@@ -15,10 +15,6 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const supabase = createClient(req, res);
-  const authenticated = isUserAuthenticated(req);
-  if (!authenticated) {
-    return res.status(401).json({ error: 'Нет доступа' });
-  }
 
   if (req.method === 'GET') {
     try {
@@ -41,6 +37,11 @@ export default async function handler(
   }
 
   if (req.method === 'POST') {
+    const authenticated = isUserAuthenticated(req);
+    if (!authenticated) {
+      return res.status(401).json({ error: 'Нет доступа' });
+    }
+
     try {
       const form = formidable({ multiples: false });
 
