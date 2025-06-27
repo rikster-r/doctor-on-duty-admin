@@ -30,7 +30,7 @@ const ScheduleControlPage = ({
   );
 
   return (
-    <Layout title="Панель графиков" description="Управление графиками врачей">
+    <Layout title="Панель графиков | Дежурный доктор" description="Управление графиками врачей">
       <main
         className={`${
           activeTab === 'calendar' ? 'max-w-[1100px]' : 'max-w-[800px]'
