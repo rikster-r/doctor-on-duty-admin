@@ -39,7 +39,7 @@ const UserMenu = ({ openChangePasswordModal, openChangeImageModal }: Props) => {
             <button
               onClick={() => openChangeImageModal(true)}
               className="data-active:bg-blue-50 data-active:text-blue-800 text-gray-700
-                  w-full px-5 py-3 text-left text-sm flex items-center gap-2 rounded-b-xl"
+                  w-full px-4 py-3 text-left text-sm flex items-center gap-2 rounded-b-xl"
             >
               <ImageSquare size={16} />
               Изменить фотографию

@@ -89,7 +89,7 @@ export default function UsersDashboard() {
           <div className="mb-4">
             <h1 className="text-lg font-semibold">Панель пользователей</h1>
             <p className="text-gray-500 text-sm">
-              Создание и редактирование профилей, графиков и ролей
+              Создание и редактирование профилей и данных врачей
             </p>
           </div>
           <div className="relative mb-2">
