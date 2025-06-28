@@ -7,12 +7,13 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const supabase = createClient(req, res);
-  const user = getUserFromRequest(req);
-  if (!user) {
-    return res.status(401).json({ error: 'Нет доступа' });
-  }
 
   if (req.method === 'GET') {
+    const user = getUserFromRequest(req);
+    if (!user) {
+      return res.status(401).json({ error: 'Нет доступа' });
+    }
+
     try {
       const query = supabase
         .from('consultations')
@@ -46,6 +47,39 @@ export default async function handler(
       return res
         .status(500)
         .json({ message: 'Server error', error: (error as Error).message });
+    }
+  } else if (req.method === 'POST') {
+    const { cron } = req.query;
+
+    if (!cron) {
+      return res.status(403).json('Разрешен только крон');
+    }
+
+    try {
+      const { data, error: updateError } = await supabase
+        .from('consultations')
+        .update({
+          archived: true,
+          archived_at: new Date().toISOString(),
+        })
+        .neq('archived', true)
+        .select();
+
+      if (updateError) {
+        throw new Error(updateError.message);
+      }
+
+      const count = data?.length ?? 0;
+
+      return res.status(200).json({
+        message: `Successfully archived ${count} consultations`,
+      });
+    } catch (error) {
+      console.error('Cron job error:', error);
+      return res.status(500).json({
+        message: 'Cron job failed',
+        error: (error as Error).message,
+      });
     }
   }
 
