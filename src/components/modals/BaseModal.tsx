@@ -13,7 +13,7 @@ const BaseModal = ({ children, isOpen, setIsOpen }: Props) => {
 
       <div className="fixed inset-0 flex items-center justify-center p-4 z-70">
         <DialogPanel
-          className={`bg-white rounded-xl shadow-lg overflow-auto w-full max-w-md`}
+          className={`bg-white rounded-xl shadow-lg overflow-auto w-full max-w-md  max-h-[98%]`}
         >
           {children}
         </DialogPanel>

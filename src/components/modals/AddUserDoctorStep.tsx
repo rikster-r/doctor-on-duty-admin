@@ -2,6 +2,7 @@ import { CaretDown } from 'phosphor-react';
 
 type FormDataType = {
   firstName: string;
+  middleName: string;
   lastName: string;
   role: string;
   phoneNumber: string;

@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 type FormDataType = {
   firstName: string;
+  middleName: string;
   lastName: string;
   role: string;
   phoneNumber: string;
@@ -46,6 +47,23 @@ const AddUserMainStep = ({ formData, setFormData }: Props) => {
           name="firstName"
           placeholder="Введите имя"
           value={formData.firstName}
+          onChange={handleInputChange}
+          className="peer w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-sm"
+        />
+      </div>
+      <div className="mb-4 group">
+        <label
+          htmlFor="middleName"
+          className="block font-medium mb-1 text-sm text-gray-700 group-focus-within:text-blue-800"
+        >
+          Отчество
+        </label>
+        <input
+          type="text"
+          id="middleName"
+          name="middleName"
+          placeholder="Введите отчество"
+          value={formData.middleName}
           onChange={handleInputChange}
           className="peer w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-sm"
         />

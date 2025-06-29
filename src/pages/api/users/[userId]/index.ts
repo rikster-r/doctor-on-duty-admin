@@ -29,6 +29,7 @@ export default async function handler(
   } else if (req.method === 'PUT') {
     const {
       first_name,
+      middle_name,
       last_name,
       phone_number,
       role,
@@ -49,11 +50,12 @@ export default async function handler(
       .from('users')
       .update([
         {
-          ...(first_name && { first_name }),
-          ...(last_name && { last_name }),
-          ...(phone_number && { phone_number }),
+          ...(first_name && { first_name: first_name.trim() }),
+          ...(middle_name && { middle_name: middle_name.trim() }),
+          ...(last_name && { last_name: last_name.trim() }),
+          ...(phone_number && { phone_number: phone_number.trim() }),
           ...(role && { role }),
-          ...(password && { password_hash: await hash(password, 10) }),
+          ...(password && { password_hash: await hash(password.trim(), 10) }),
         },
       ])
       .eq('id', userId);

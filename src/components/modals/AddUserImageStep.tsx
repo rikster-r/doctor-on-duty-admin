@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 
 type FormDataType = {
   firstName: string;
+  middleName: string;
   lastName: string;
   role: string;
   phoneNumber: string;

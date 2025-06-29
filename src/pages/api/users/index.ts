@@ -91,6 +91,7 @@ export default async function handler(
       // Парсинг
       const {
         first_name,
+        middle_name,
         last_name,
         phone_number,
         password,
@@ -100,6 +101,7 @@ export default async function handler(
         profile_image,
       }: {
         first_name: string;
+        middle_name: string;
         last_name: string;
         phone_number: string;
         password: string;
@@ -115,13 +117,14 @@ export default async function handler(
           }
 
           resolve({
-            first_name: fields.first_name?.at(0) ?? '',
-            last_name: fields.last_name?.at(0) ?? '',
-            phone_number: fields.phone_number?.at(0) ?? '',
-            password: fields.password?.at(0) ?? '',
+            first_name: fields.first_name?.at(0)?.trim() ?? '',
+            middle_name: fields.middle_name?.at(0)?.trim() ?? '',
+            last_name: fields.last_name?.at(0)?.trim() ?? '',
+            phone_number: fields.phone_number?.at(0)?.trim() ?? '',
+            password: fields.password?.at(0)?.trim() ?? '',
             role: fields.role?.at(0) ?? '',
             department_id: Number(fields.department_id?.at(0)) ?? 0,
-            specialization: fields.specialization?.at(0) ?? '',
+            specialization: fields.specialization?.at(0)?.trim() ?? '',
             profile_image: files.profile_image?.at(0) ?? null,
           });
         });
@@ -177,6 +180,7 @@ export default async function handler(
         .insert([
           {
             first_name,
+            ...(middle_name && { middle_name }),
             last_name,
             phone_number,
             password_hash: hashedPassword,

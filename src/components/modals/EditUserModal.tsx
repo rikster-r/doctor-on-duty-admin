@@ -22,6 +22,7 @@ const EditUserModal = ({
 }: Props) => {
   const [formData, setFormData] = useState({
     firstName: user.first_name,
+    middleName: user.middle_name ?? '',
     lastName: user.last_name,
     role: user.role,
     phoneNumber: user.phone_number,
@@ -39,6 +40,7 @@ const EditUserModal = ({
       },
       body: JSON.stringify({
         first_name: formData.firstName,
+        middle_name: formData.middleName,
         last_name: formData.lastName,
         role: formData.role,
         phone_number: formData.phoneNumber,
@@ -82,20 +84,37 @@ const EditUserModal = ({
         </div>
 
         <div>
+          <div className="mb-4 group">
+            <label
+              htmlFor="firstName"
+              className="block font-medium mb-1 text-sm text-gray-700 group-focus-within:text-blue-800"
+            >
+              Имя
+            </label>
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              placeholder="Введите имя"
+              value={formData.firstName}
+              onChange={handleInputChange}
+              className="peer w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-sm"
+            />
+          </div>
           <div className="flex gap-2">
             <div className="mb-4 group">
               <label
-                htmlFor="firstName"
+                htmlFor="middleName"
                 className="block font-medium mb-1 text-sm text-gray-700 group-focus-within:text-blue-800"
               >
-                Имя
+                Отчество
               </label>
               <input
                 type="text"
-                id="firstName"
-                name="firstName"
-                placeholder="Введите имя"
-                value={formData.firstName}
+                id="middleName"
+                name="middleName"
+                placeholder="Введите отчество"
+                value={formData.middleName}
                 onChange={handleInputChange}
                 className="peer w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-sm"
               />

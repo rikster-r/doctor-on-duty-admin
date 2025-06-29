@@ -170,9 +170,16 @@ export default function UsersDashboard() {
                             setChangeImageModalOpen(true);
                           }}
                         />
-                        <span className="text-sm">
-                          {user.first_name} {user.last_name}
-                        </span>
+                        <div className="flex flex-col leading-tight">
+                          <span className="text-sm font-medium">
+                            {user.first_name}
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {[user.middle_name, user.last_name]
+                              .filter(Boolean)
+                              .join(' ')}
+                          </span>
+                        </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-sm">
                         {user.phone_number}

@@ -17,6 +17,7 @@ type Props = {
 
 type FormDataType = {
   firstName: string;
+  middleName: string;
   lastName: string;
   role: string;
   phoneNumber: string;
@@ -35,6 +36,7 @@ const AddUserModal = ({
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState<FormDataType>({
     firstName: '',
+    middleName: '',
     lastName: '',
     role: '',
     phoneNumber: '',
@@ -58,6 +60,7 @@ const AddUserModal = ({
   const createUser = async () => {
     const formDataToSend = new FormData();
     formDataToSend.append('first_name', formData.firstName);
+    formDataToSend.append('middle_name', formData.middleName)
     formDataToSend.append('last_name', formData.lastName);
     formDataToSend.append('role', formData.role);
     formDataToSend.append('phone_number', formData.phoneNumber);

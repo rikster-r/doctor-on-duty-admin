@@ -22,11 +22,11 @@ export default async function handler(
         .select(
           `*, 
           requester:users!requester_id (
-            id, first_name, last_name, photo_url,
+            id, first_name, middle_name, last_name, photo_url,
             doctor_data:doctors(specialization, department:departments(id, name))
           ),
           recipient:users!recipient_id (
-            id, first_name, last_name, photo_url, 
+            id, first_name, middle_name, last_name, photo_url, 
             doctor_data:doctors(specialization, department:departments(id, name))
           )`,
           { count: 'exact' }
