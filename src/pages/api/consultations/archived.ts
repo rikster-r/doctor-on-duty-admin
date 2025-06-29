@@ -20,16 +20,17 @@ export default async function handler(
         .select(
           `*, 
           requester:users!requester_id (
-            id, first_name, last_name, photo_url,
-            doctor_data:doctors(specialization, department:departments(id, name))
+        id, first_name, middle_name, last_name, photo_url,
+        doctor_data:doctors(specialization, department:departments(id, name))
           ),
           recipient:users!recipient_id (
-            id, first_name, last_name, photo_url, 
-            doctor_data:doctors(specialization, department:departments(id, name))
+        id, first_name, middle_name, last_name, photo_url, 
+        doctor_data:doctors(specialization, department:departments(id, name))
           )`,
           { count: 'exact' }
         )
         .eq('archived', true)
+        .or(`requester_id.eq.${user.id},recipient_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
 
       const { data, count, error } = await query;

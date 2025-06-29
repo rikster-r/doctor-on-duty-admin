@@ -31,7 +31,8 @@ export default async function handler(
           )`,
           { count: 'exact' }
         )
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .neq('archived', true);
 
       if (from) {
         query.eq('requester_id', from);
