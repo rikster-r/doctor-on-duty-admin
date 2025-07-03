@@ -18,11 +18,12 @@ export const sendNotificationToUser = async (
     if (userTokens.length === 0) {
       throw new Error(`Пуш-токены для пользователя ${userId} не найдены`);
     }
+
     // Create notification messages
     const messages: ExpoPushMessage[] = userTokens
-      .filter((tokenData) => Expo.isExpoPushToken(tokenData.pushToken))
+      .filter((tokenData) => Expo.isExpoPushToken(tokenData.token))
       .map((tokenData) => ({
-        to: tokenData.pushToken,
+        to: tokenData.token,
         sound: 'default',
         title: notificationData.title,
         body: notificationData.body,
@@ -34,9 +35,7 @@ export const sendNotificationToUser = async (
       throw new Error(
         `Нет действительных пуш-токенов для пользователя ${userId}`
       );
-    }
-    // Save in db - optional
-    
+    }    
     // Send notifications
     await sendPushNotifications(messages);
     return;
