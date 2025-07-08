@@ -2,12 +2,6 @@ import { useRouter } from 'next/router';
 import { createContext, useContext } from 'react';
 import useSWR from 'swr';
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-}
-
 interface UserContextType {
   user: User | null;
   login: (userData: User) => void;

@@ -4,6 +4,7 @@ import { X, CaretLeft, CaretDown } from 'phosphor-react';
 import { DialogTitle } from '@headlessui/react';
 import { KeyedMutator } from 'swr';
 import { toast } from 'react-toastify';
+import { useUser } from '@/hooks/useUser';
 
 type Props = {
   isOpen: boolean;
@@ -20,6 +21,7 @@ const EditUserModal = ({
   mutateUsers,
   departments,
 }: Props) => {
+  const {user: currentUser} = useUser();
   const [formData, setFormData] = useState({
     firstName: user.first_name,
     middleName: user.middle_name ?? '',
@@ -68,6 +70,8 @@ const EditUserModal = ({
       [name]: value,
     }));
   };
+
+  if (!currentUser) return <></>;
 
   return (
     <BaseModal isOpen={isOpen} setIsOpen={setIsOpen}>
@@ -154,34 +158,37 @@ const EditUserModal = ({
               className="peer w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-sm"
             />
           </div>
-          <div className="mb-4 group">
-            <label
-              htmlFor="role"
-              className="block font-medium mb-1 text-sm text-gray-700 group-focus-within:text-blue-800"
-            >
-              Роль
-            </label>
-            <div className="relative">
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-sm"
+          {currentUser.role === 'head-admin' && (
+            <div className="mb-4 group">
+              <label
+                htmlFor="role"
+                className="block font-medium mb-1 text-sm text-gray-700 group-focus-within:text-blue-800"
               >
-                <option value="" disabled>
-                  Выберите роль
-                </option>
-                <option value="admin">Администратор</option>
-                <option value="doctor">Врач</option>
-                <option value="head-doctor">Главный врач</option>
-              </select>
-              <CaretDown
-                size={16}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
-              />
+                Роль
+              </label>
+              <div className="relative">
+                <select
+                  id="role"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-sm"
+                >
+                  <option value="" disabled>
+                    Выберите роль
+                  </option>
+                  <option value="doctor">Врач</option>
+                  <option value="head-doctor">Главный врач</option>
+                  <option value="admin">Администратор</option>
+                  <option value="head-admin">Главный администратор</option>
+                </select>
+                <CaretDown
+                  size={16}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+                />
+              </div>
             </div>
-          </div>
+          )}
           <div className="mb-4 group">
             <label
               htmlFor="departmentId"

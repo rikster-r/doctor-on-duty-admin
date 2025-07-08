@@ -8,6 +8,7 @@ import {
   Trash,
   DotsSixVertical,
 } from 'phosphor-react';
+import { useUser } from '@/hooks/useUser';
 
 type Props = {
   department: Department;
@@ -22,6 +23,7 @@ export default function SortableDepartmentItem({
   setEditDepartmentModalOpen,
   deleteDepartment,
 }: Props) {
+  const { user } = useUser();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -50,15 +52,21 @@ export default function SortableDepartmentItem({
     cursor: isDragging ? 'grabbing' : isMobile ? 'grab' : 'default',
   };
 
+  if (!user) return <></>;
+
   return (
     <div
       ref={setNodeRef}
       style={style}
-      className="min-h-[140px] sm:min-h-[150px] bg-white shadow-lg hover:shadow-2xl hover:scale-105 rounded-2xl p-3 sm:px-6 flex flex-col items-center gap-3 transition-shadow relative"
-      {...(isMobile ? { ...attributes, ...listeners } : {})} // Перетаскивание через любую точку на диве на телефоне
+      className={`${
+        user.role === 'head-admin' ? 'hover:shadow-2xl hover:scale-105' : ''
+      } min-h-[140px] sm:min-h-[150px] bg-white shadow-lg rounded-2xl p-3 sm:px-6 flex flex-col items-center gap-3 transition-shadow relative`}
+      {...(isMobile && user.role === 'head-admin'
+        ? { ...attributes, ...listeners }
+        : {})} // Перетаскивание через любую точку на диве на телефоне
     >
       {/* Перетаскивание через кнопку на десктопе*/}
-      {!isMobile && (
+      {!isMobile && user.role === 'head-admin' && (
         <div
           {...attributes}
           {...listeners}
@@ -92,23 +100,25 @@ export default function SortableDepartmentItem({
           {department.name}
         </h2>
       </div>
-      <div className="flex gap-3 mt-auto">
-        <button
-          className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
-          onClick={() => {
-            setSelectedDepartment(department);
-            setEditDepartmentModalOpen(true);
-          }}
-        >
-          <NotePencil size={18} />
-        </button>
-        <button
-          className="text-gray-600 hover:text-gray-700 flex items-center gap-1 text-sm"
-          onClick={() => deleteDepartment(department.id)}
-        >
-          <Trash size={18} />
-        </button>
-      </div>
+      {user.role === 'head-admin' && (
+        <div className="flex gap-3 mt-auto">
+          <button
+            className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
+            onClick={() => {
+              setSelectedDepartment(department);
+              setEditDepartmentModalOpen(true);
+            }}
+          >
+            <NotePencil size={18} />
+          </button>
+          <button
+            className="text-gray-600 hover:text-gray-700 flex items-center gap-1 text-sm"
+            onClick={() => deleteDepartment(department.id)}
+          >
+            <Trash size={18} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

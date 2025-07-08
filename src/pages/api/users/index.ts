@@ -134,7 +134,7 @@ export default async function handler(
       if (!first_name || !last_name || !phone_number || !password || !role) {
         return res.status(400).json('Заполните все обязательные поля');
       }
-      if (!['doctor', 'admin', 'head-doctor'].includes(role)) {
+      if (!['doctor', 'admin', 'head-doctor', 'head-admin'].includes(role)) {
         return res.status(400).json({ error: 'Недопустимая роль' });
       }
       if (!/^\+?[1-9]\d{1,14}$/.test(phone_number)) {

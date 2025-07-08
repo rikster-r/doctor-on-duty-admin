@@ -50,7 +50,7 @@ const Login = () => {
         return;
       }
 
-      if (data.user.role !== 'admin') {
+      if (data.user.role !== 'admin' && data.user.role !== 'head-admin') {
         toast.error('Вы не являетесь администратором');
         return;
       }

@@ -24,7 +24,8 @@ const pageSize = 50;
 const userRolesMap = {
   admin: 'Администратор',
   doctor: 'Врач',
-  'head-doctor': 'Главный врач',
+  'head-doctor': 'Гл. врач',
+  'head-admin': 'Гл. администратор',
 };
 
 export default function UsersDashboard() {

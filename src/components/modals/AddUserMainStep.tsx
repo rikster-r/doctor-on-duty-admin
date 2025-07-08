@@ -1,3 +1,4 @@
+import { useUser } from '@/hooks/useUser';
 import { CaretDown, Eye, EyeClosed } from 'phosphor-react';
 import { useState } from 'react';
 
@@ -20,7 +21,10 @@ type Props = {
 
 // main step of adding user with main data
 const AddUserMainStep = ({ formData, setFormData }: Props) => {
+  const { user } = useUser();
   const [showPassword, setShowPassword] = useState(false);
+
+  if (!user) return <></>;
 
   const handleInputChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLSelectElement
@@ -103,9 +107,15 @@ const AddUserMainStep = ({ formData, setFormData }: Props) => {
             <option value="" disabled>
               Выберите роль
             </option>
-            <option value="admin">Администратор</option>
+
             <option value="doctor">Врач</option>
             <option value="head-doctor">Главный врач</option>
+            {user.role === 'head-admin' && (
+              <>
+                <option value="admin">Администратор</option>
+                <option value="head-admin">Главный администратор</option>
+              </>
+            )}
           </select>
           <CaretDown
             size={16}
