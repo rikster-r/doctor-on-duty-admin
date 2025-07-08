@@ -39,7 +39,7 @@ export default async function handler(
     } = req.body;
 
     // Валидация данных
-    if (role && !['doctor', 'admin'].includes(role)) {
+    if (role && !['doctor', 'admin', 'head-doctor'].includes(role)) {
       return res.status(400).json({ error: 'Недопустимая роль' });
     }
     if (phone_number && !/^\+?[1-9]\d{1,14}$/.test(phone_number)) {

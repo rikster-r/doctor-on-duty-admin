@@ -173,7 +173,8 @@ const EditUserModal = ({
                   Выберите роль
                 </option>
                 <option value="admin">Администратор</option>
-                <option value="doctor">Доктор</option>
+                <option value="doctor">Врач</option>
+                <option value="head-doctor">Главный врач</option>
               </select>
               <CaretDown
                 size={16}

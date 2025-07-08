@@ -21,6 +21,12 @@ import { useRouter } from 'next/router';
 
 const pageSize = 50;
 
+const userRolesMap = {
+  admin: 'Администратор',
+  doctor: 'Врач',
+  'head-doctor': 'Главный врач',
+};
+
 export default function UsersDashboard() {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
@@ -185,7 +191,8 @@ export default function UsersDashboard() {
                         {user.phone_number}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-sm">
-                        {user.role === 'admin' ? 'Администратор' : 'Доктор'}
+                        {userRolesMap[user.role as keyof typeof userRolesMap] ||
+                          'Неизвестная роль'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-sm">
                         {user.doctor_data?.department
