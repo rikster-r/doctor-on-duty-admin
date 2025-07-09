@@ -9,7 +9,6 @@ import {
 import { Popover, PopoverPanel, PopoverButton } from '@headlessui/react';
 import UserImage from './UserImage';
 import type { KeyedMutator } from 'swr';
-import { addDays } from 'date-fns';
 
 type Props = {
   selectedDepartmentId: number | null;
@@ -38,7 +37,7 @@ const monthNames = [
 const DepartmentScheduleCalendar: React.FC<Props> = ({
   selectedDepartmentId,
   schedules,
-  mutateSchedules,
+  // mutateSchedules,
   currentDate,
   setCurrentDate,
 }) => {
@@ -91,16 +90,6 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
 
   return (
     <div className="bg-white rounded-lg shadow-md">
-      {/* Header */}
-      <div className="px-4 sm:px-6 py-4 border-b border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900">
-          Календарь отделения
-        </h3>
-        <p className="text-sm text-gray-600 mt-1">
-          Просмотр расписания всех врачей отделения
-        </p>
-      </div>
-
       {/* Calendar Header */}
       <div className="px-2 sm:px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row items-center justify-between">
         <div className="flex items-center space-x-4">
