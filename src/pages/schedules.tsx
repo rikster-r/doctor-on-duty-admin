@@ -29,7 +29,7 @@ type Props = {
   initialDepartmentId: string | null;
 };
 
-function Departments({ initialDepartmentId }: Props) {
+function Schedules({ initialDepartmentId }: Props) {
   const { data: departments, isLoading: isDepartmentsLoading } = useSWR<
     Department[]
   >('/api/departments', fetcher);
@@ -56,11 +56,17 @@ function Departments({ initialDepartmentId }: Props) {
     isLoading: isSchedulesLoading,
     mutateSchedules,
   } = useSchedules(selectedDepartmentId, selectedDate);
+  const { data: doctors, isLoading: isDoctorsLoading } = useSWR<User[]>(
+    `/api/departments/${selectedDepartmentId}/doctors`,
+    fetcher
+  );
 
-  const isLoading = isSchedulesLoading || isDepartmentsLoading;
+  const isLoading =
+    isSchedulesLoading || isDepartmentsLoading || isDoctorsLoading;
 
   return (
     <SchedulesDashboard
+      doctors={doctors ?? []}
       departments={departments}
       selectedDepartmentId={selectedDepartmentId}
       setSelectedDepartmentId={setSelectedDepartmentId}
@@ -73,4 +79,4 @@ function Departments({ initialDepartmentId }: Props) {
   );
 }
 
-export default Departments;
+export default Schedules;

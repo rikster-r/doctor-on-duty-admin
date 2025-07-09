@@ -59,8 +59,8 @@ const DepartmentCombobox = ({
               <div className="absolute inset-y-0 left-0 flex items-center pl-3">
                 <DepartmentImage
                   photoUrl={selectedDepartment.photo_url}
-                  width={36}
-                  height={36}
+                  width={32}
+                  height={32}
                 />
               </div>
             )}
@@ -102,27 +102,11 @@ const DepartmentCombobox = ({
                 filteredDepartments.map((department) => (
                   <ComboboxOption
                     key={department.id}
-                    className={`relative cursor-default select-none py-3 pl-10 pr-4 data-focus:bg-blue-600 data-focus:text-white text-gray-900`}
+                    className={`relative cursor-default select-none py-3 pl-10 pr-4 data-focus:bg-blue-500 data-focus:text-white text-gray-900`}
                     value={department}
                   >
                     {({ selected, focus }) => (
                       <>
-                        <div className="flex items-center">
-                          <DepartmentImage
-                            photoUrl={department.photo_url}
-                            width={36}
-                            height={36}
-                          />
-                          <div className="ml-3 flex-1">
-                            <div
-                              className={`block truncate font-medium ${
-                                selected ? 'font-semibold' : 'font-normal'
-                              }`}
-                            >
-                              {department.name}
-                            </div>
-                          </div>
-                        </div>
                         {selected ? (
                           <span
                             className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
@@ -132,6 +116,22 @@ const DepartmentCombobox = ({
                             <Check className="h-5 w-5" aria-hidden="true" />
                           </span>
                         ) : null}
+                        <div className="flex items-center">
+                          <DepartmentImage
+                            photoUrl={department.photo_url}
+                            width={32}
+                            height={32}
+                          />
+                          <div className="ml-3 flex-1">
+                            <div
+                              className={`text-sm block truncate font-medium ${
+                                selected ? 'font-semibold' : 'font-normal'
+                              }`}
+                            >
+                              {department.name}
+                            </div>
+                          </div>
+                        </div>
                       </>
                     )}
                   </ComboboxOption>

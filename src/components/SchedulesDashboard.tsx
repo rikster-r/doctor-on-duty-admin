@@ -4,6 +4,7 @@ import ScheduleCalendar from './ScheduleCalendar';
 import { KeyedMutator } from 'swr';
 
 type Props = {
+  doctors: User[];
   departments: Department[] | undefined;
   selectedDepartmentId: number | null;
   setSelectedDepartmentId: (id: number | null) => void;
@@ -15,6 +16,7 @@ type Props = {
 };
 
 const ScheduleControlPage = ({
+  doctors,
   departments,
   selectedDepartmentId,
   setSelectedDepartmentId,
@@ -56,6 +58,7 @@ const ScheduleControlPage = ({
         {!isLoading && (
           <div className="space-y-6">
             <ScheduleCalendar
+              doctors={doctors}
               selectedDepartmentId={selectedDepartmentId}
               schedules={schedules}
               mutateSchedules={mutateSchedules}
