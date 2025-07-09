@@ -8,66 +8,69 @@ import {
 } from '@headlessui/react';
 import { CaretDown, Check } from 'phosphor-react';
 import { Fragment, useState } from 'react';
-import UserImage from './UserImage';
+import DepartmentImage from './DepartmentImage';
 
 type Props = {
-  doctors: User[] | undefined;
-  selectedDoctorId: number | null;
-  onDoctorChange: (doctorId: number | null) => void;
+  departments: Department[] | undefined;
+  selectedDepartmentId: number | null;
+  onDepartmentChange: (departmentId: number | null) => void;
   isLoading?: boolean;
   placeholder?: string;
   className?: string;
 };
 
-const DoctorCombobox = ({
-  doctors,
-  selectedDoctorId,
-  onDoctorChange,
+const DepartmentCombobox = ({
+  departments,
+  selectedDepartmentId,
+  onDepartmentChange,
   isLoading = false,
-  placeholder = 'Выберите врача...',
+  placeholder = 'Выберите отделение...',
   className = 'w-full sm:w-80',
 }: Props) => {
   const [query, setQuery] = useState('');
 
-  const selectedDoctor =
-    doctors?.find((doctor) => doctor.id === selectedDoctorId) || null;
+  const selectedDepartment =
+    departments?.find((department) => department.id === selectedDepartmentId) ||
+    null;
 
-  const filteredDoctors =
+  const filteredDepartments =
     query === ''
-      ? doctors || []
-      : (doctors || []).filter((doctor) => {
-          const fullName = `${doctor.first_name} ${doctor.last_name}`;
-          const specialization = doctor.doctor_data?.specialization || '';
-          const department = doctor.doctor_data?.department?.name || '';
+      ? departments || []
+      : (departments || []).filter((department) => {
+          const name = department.name || '';
 
-          return (
-            fullName.toLowerCase().includes(query.toLowerCase()) ||
-            specialization.toLowerCase().includes(query.toLowerCase()) ||
-            department.toLowerCase().includes(query.toLowerCase())
-          );
+          return name.toLowerCase().includes(query.toLowerCase());
         });
 
-  const handleDoctorChange = (doctor: User | null) => {
-    onDoctorChange(doctor?.id || null);
+  const handleDepartmentChange = (department: Department | null) => {
+    onDepartmentChange(department?.id || null);
   };
 
   return (
     <div className={className}>
-      <Combobox immediate value={selectedDoctor} onChange={handleDoctorChange}>
+      <Combobox
+        immediate
+        value={selectedDepartment}
+        onChange={handleDepartmentChange}
+      >
         <div className="relative">
-          <ComboboxButton className="relative w-full cursor-default overflow-hidden rounded-lg bg-white text-left shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-300 sm:text-sm">
-            {selectedDoctor && (
+          <ComboboxButton className="flex items-center relative w-full cursor-default overflow-hidden rounded-lg bg-white text-left shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-blue-300 sm:text-sm">
+            {selectedDepartment && (
               <div className="absolute inset-y-0 left-0 flex items-center pl-3">
-                <UserImage photoUrl={selectedDoctor.photo_url} size={32} />
+                <DepartmentImage
+                  photoUrl={selectedDepartment.photo_url}
+                  width={36}
+                  height={36}
+                />
               </div>
             )}
 
             <ComboboxInput
               className={`w-full border-none px-4 py-4 pr-10 text-sm leading-5 text-gray-900 focus:ring-0 focus:outline-none ${
-                selectedDoctor ? 'pl-13' : 'pl-4'
+                selectedDepartment ? 'pl-13' : 'pl-4'
               }`}
-              displayValue={(doctor: User | null) =>
-                doctor ? `${doctor.first_name} ${doctor.last_name}` : ''
+              displayValue={(department: Department | null) =>
+                department ? department.name : ''
               }
               onChange={(event) => setQuery(event.target.value)}
               placeholder={placeholder}
@@ -91,43 +94,33 @@ const DoctorCombobox = ({
                     <span>Загрузка...</span>
                   </div>
                 </div>
-              ) : filteredDoctors.length === 0 && query !== '' ? (
+              ) : filteredDepartments.length === 0 && query !== '' ? (
                 <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
-                  Врач не найден.
+                  Отделение не найдено.
                 </div>
               ) : (
-                filteredDoctors.map((doctor) => (
+                filteredDepartments.map((department) => (
                   <ComboboxOption
-                    key={doctor.id}
+                    key={department.id}
                     className={`relative cursor-default select-none py-3 pl-10 pr-4 data-focus:bg-blue-600 data-focus:text-white text-gray-900`}
-                    value={doctor}
+                    value={department}
                   >
                     {({ selected, focus }) => (
                       <>
                         <div className="flex items-center">
-                          <UserImage photoUrl={doctor.photo_url} size={32} />
+                          <DepartmentImage
+                            photoUrl={department.photo_url}
+                            width={36}
+                            height={36}
+                          />
                           <div className="ml-3 flex-1">
                             <div
                               className={`block truncate font-medium ${
                                 selected ? 'font-semibold' : 'font-normal'
                               }`}
                             >
-                              {doctor.first_name} {doctor.last_name}
+                              {department.name}
                             </div>
-                            {doctor.doctor_data && (
-                              <div
-                                className={`text-xs truncate ${
-                                  focus ? 'text-blue-200' : 'text-gray-500'
-                                }`}
-                              >
-                                {doctor.doctor_data.specialization}
-                                {doctor.doctor_data.department &&
-                                doctor.doctor_data.specialization
-                                  ? ' •  '
-                                  : ''}
-                                {doctor.doctor_data.department.name}
-                              </div>
-                            )}
                           </div>
                         </div>
                         {selected ? (
@@ -152,4 +145,4 @@ const DoctorCombobox = ({
   );
 };
 
-export default DoctorCombobox;
+export default DepartmentCombobox;

@@ -3,10 +3,10 @@ import { GetServerSidePropsContext } from 'next';
 import useSWR from 'swr';
 import { fetcher } from '@/lib/fetcher';
 import { useEffect, useState } from 'react';
+import useSchedules from '@/hooks/useSchedules';
 
 export const getServerSideProps = (context: GetServerSidePropsContext) => {
   const authToken = context.req.cookies.authToken;
-
   if (!authToken) {
     return {
       redirect: {
@@ -15,77 +15,62 @@ export const getServerSideProps = (context: GetServerSidePropsContext) => {
       },
     };
   }
-
   return {
     props: {
-      initialDoctorId:
-        context.query.doctorId === undefined
+      initialDepartmentId:
+        context.query.departmentId === undefined
           ? null
-          : (context.query.doctorId as string),
+          : (context.query.departmentId as string),
     },
   };
 };
 
 type Props = {
-  initialDoctorId: string | null;
+  initialDepartmentId: string | null;
 };
 
-function Users({ initialDoctorId }: Props) {
-  const { data: doctors, isLoading: isDoctorsLoading } = useSWR<User[]>(
-    `/api/doctors`,
-    fetcher
-  );
+function Departments({ initialDepartmentId }: Props) {
+  const { data: departments, isLoading: isDepartmentsLoading } = useSWR<
+    Department[]
+  >('/api/departments', fetcher);
 
-  const [selectedDoctorId, setSelectedDoctorId] = useState<number | null>(null);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState<
+    number | null
+  >(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {
-    if (doctors && doctors.length > 0) {
-      const initialId = Number(initialDoctorId);
-      const isValidId = doctors.some((doc) => doc.id === initialId);
-
-      if (initialDoctorId && isValidId) {
-        setSelectedDoctorId(initialId);
+    if (departments && departments.length > 0) {
+      const initialId = Number(initialDepartmentId);
+      const isValidId = departments.some((dept) => dept.id === initialId);
+      if (initialDepartmentId && isValidId) {
+        setSelectedDepartmentId(initialId);
       } else {
-        setSelectedDoctorId(doctors[0].id);
+        setSelectedDepartmentId(departments[0].id);
       }
     }
-  }, [doctors, initialDoctorId]);
+  }, [departments, initialDepartmentId]);
 
   const {
-    data: defaultSchedules,
-    mutate: mutateDefaultSchedules,
-    isLoading: isDefaultsLoading,
-  } = useSWR(
-    selectedDoctorId
-      ? `/api/doctors/${selectedDoctorId}/schedules/defaults`
-      : null,
-    fetcher
-  );
-  const {
-    data: scheduleOverrides,
-    mutate: mutateScheduleOverrides,
-    isLoading: isOverridesLoading,
-  } = useSWR(
-    selectedDoctorId
-      ? `/api/doctors/${selectedDoctorId}/schedules/overrides`
-      : null,
-    fetcher
-  );
+    schedules,
+    isLoading: isSchedulesLoading,
+    mutateSchedules,
+  } = useSchedules(selectedDepartmentId, selectedDate);
 
-  const isLoading = isDefaultsLoading || isOverridesLoading || isDoctorsLoading;
+  const isLoading = isSchedulesLoading || isDepartmentsLoading;
 
   return (
     <SchedulesDashboard
-      doctors={doctors}
-      selectedDoctorId={selectedDoctorId}
-      setSelectedDoctorId={setSelectedDoctorId}
-      defaultSchedules={defaultSchedules}
-      mutateDefaultSchedules={mutateDefaultSchedules}
-      scheduleOverrides={scheduleOverrides}
-      mutateScheduleOverrides={mutateScheduleOverrides}
+      departments={departments}
+      selectedDepartmentId={selectedDepartmentId}
+      setSelectedDepartmentId={setSelectedDepartmentId}
+      selectedDate={selectedDate}
+      setSelectedDate={setSelectedDate}
+      schedules={schedules}
+      mutateSchedules={mutateSchedules}
       isLoading={isLoading}
     />
   );
 }
 
-export default Users;
+export default Departments;

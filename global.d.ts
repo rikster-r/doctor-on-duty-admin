@@ -39,12 +39,14 @@ type Schedule = {
 };
 
 type UserWithSchedule = User & {
-  schedule: {
-    id: number,
+  schedule?: {
+    id: number;
     start_time: string; // 'HH:mm'
     end_time: string; // 'HH:mm'
   };
 };
+
+type DepartmentDateSchedule = { date: string; users: UserWithSchedule[] };
 
 type NotificationPushToken = {
   id: number;

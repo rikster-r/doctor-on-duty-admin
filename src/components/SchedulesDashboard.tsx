@@ -1,41 +1,35 @@
-import React, { useState } from 'react';
 import Layout from '@/components/Layout';
-import DoctorCombobox from './UserSelectCombobox';
-import DefaultSchedulesControl from './DefaultSchedulesControl';
+import DepartmentCombobox from './DepartmentCombobox';
 import ScheduleCalendar from './ScheduleCalendar';
+import { KeyedMutator } from 'swr';
 
 type Props = {
-  doctors: User[] | undefined;
-  selectedDoctorId: number | null;
-  setSelectedDoctorId: React.Dispatch<React.SetStateAction<number | null>>;
-  defaultSchedules: DefaultSchedule[] | null;
-  mutateDefaultSchedules: () => void;
-  scheduleOverrides: ScheduleOverride[] | null;
-  mutateScheduleOverrides: () => void;
+  departments: Department[] | undefined;
+  selectedDepartmentId: number | null;
+  setSelectedDepartmentId: (id: number | null) => void;
+  schedules: DepartmentDateSchedule[] | undefined;
+  mutateSchedules: KeyedMutator<DepartmentDateSchedule[]>;
   isLoading: boolean;
+  selectedDate: Date;
+  setSelectedDate: React.Dispatch<React.SetStateAction<Date>>;
 };
 
 const ScheduleControlPage = ({
-  doctors,
-  selectedDoctorId,
-  setSelectedDoctorId,
-  defaultSchedules,
-  mutateDefaultSchedules,
-  scheduleOverrides,
-  mutateScheduleOverrides,
+  departments,
+  selectedDepartmentId,
+  setSelectedDepartmentId,
+  schedules,
+  mutateSchedules,
   isLoading,
+  selectedDate,
+  setSelectedDate,
 }: Props) => {
-  const [activeTab, setActiveTab] = useState<'calendar' | 'schedules'>(
-    'schedules'
-  );
-
   return (
-    <Layout title="Панель графиков | Дежурный доктор" description="Управление графиками врачей">
-      <main
-        className={`${
-          activeTab === 'calendar' ? 'max-w-[1100px]' : 'max-w-[800px]'
-        } p-4 mx-auto w-full`}
-      >
+    <Layout
+      title="Панель графиков | Дежурный доктор"
+      description="Управление графиками врачей"
+    >
+      <main className={`max-w-[1100px] p-4 mx-auto w-full`}>
         <div className="flex flex-col sm:flex-row mb-6">
           <div className="mb-4 mr-4 sm:mb-0 sm:mr-auto">
             <h1 className="text-lg font-semibold">Панель графиков</h1>
@@ -43,37 +37,13 @@ const ScheduleControlPage = ({
               Создание и редактирование графиков работы врачей
             </p>
           </div>
-          <DoctorCombobox
-            doctors={doctors}
-            selectedDoctorId={selectedDoctorId}
-            onDoctorChange={setSelectedDoctorId}
+          <DepartmentCombobox
+            departments={departments}
+            selectedDepartmentId={selectedDepartmentId}
+            onDepartmentChange={setSelectedDepartmentId}
             isLoading={isLoading}
             placeholder="Загрузка..."
           />
-        </div>
-
-        {/* Tab Navigation */}
-        <div className="flex space-x-1 mb-6 bg-gray-100 p-1 rounded-lg w-fit">
-          <button
-            onClick={() => setActiveTab('schedules')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'schedules'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Базовые графики
-          </button>
-          <button
-            onClick={() => setActiveTab('calendar')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'calendar'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Календарь
-          </button>
         </div>
 
         {isLoading && (
@@ -84,28 +54,15 @@ const ScheduleControlPage = ({
         )}
 
         {!isLoading && (
-          <>
-            {activeTab === 'calendar' && (
-              <div className="space-y-6">
-                <ScheduleCalendar
-                  selectedDoctorId={selectedDoctorId}
-                  defaultSchedules={defaultSchedules}
-                  scheduleOverrides={scheduleOverrides}
-                  mutateScheduleOverrides={mutateScheduleOverrides}
-                />
-              </div>
-            )}
-
-            {activeTab === 'schedules' &&
-              defaultSchedules &&
-              selectedDoctorId && (
-                <DefaultSchedulesControl
-                  defaultSchedules={defaultSchedules}
-                  selectedDoctorId={selectedDoctorId}
-                  mutateDefaultSchedules={mutateDefaultSchedules}
-                />
-              )}
-          </>
+          <div className="space-y-6">
+            <ScheduleCalendar
+              selectedDepartmentId={selectedDepartmentId}
+              schedules={schedules}
+              mutateSchedules={mutateSchedules}
+              currentDate={selectedDate}
+              setCurrentDate={setSelectedDate}
+            />
+          </div>
         )}
       </main>
     </Layout>
