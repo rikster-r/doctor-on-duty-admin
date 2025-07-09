@@ -29,36 +29,22 @@ type Department = {
   created_at: string;
 };
 
-type DefaultSchedule = {
+type Schedule = {
   id: number;
   user_id: number;
-  start_time: string;
-  end_time: string;
-  day_of_week: string;
-  is_day_off: boolean;
+  date: string; // 'YYYY-MM-DD'
+  start_time: string; // 'HH:mm'
+  end_time: string; // 'HH:mm'
   created_at: string;
-  user?: User;
-};
-
-type ScheduleOverride = {
-  id: number;
-  user_id: number;
-  start_time: string;
-  end_time: string;
-  date: string;
-  is_day_off: boolean;
-  created_at: string;
-  user?: User;
-};
-
-type ScheduleTimes = {
-  start_time: string;
-  end_time: string;
 };
 
 type UserWithSchedule = User & {
-  schedule: ScheduleTimes
-}
+  schedule: {
+    id: number,
+    start_time: string; // 'HH:mm'
+    end_time: string; // 'HH:mm'
+  };
+};
 
 type NotificationPushToken = {
   id: number;
@@ -67,18 +53,5 @@ type NotificationPushToken = {
   device_type: string;
   deviceName: string;
   is_active: boolean;
-  created_at: string;
-};
-
-type PushNotification = {
-  id: number;
-  consultation_id: number;
-  title: string;
-  body: string;
-  type: string;
-  is_read: boolean;
-  is_sent: boolean;
-  sent_at: string;
-  read_at: string;
   created_at: string;
 };
