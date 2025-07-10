@@ -1,7 +1,15 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import { CaretLeft, CaretRight } from 'phosphor-react';
+import { useDrag } from '@use-gesture/react';
 import type { KeyedMutator } from 'swr';
 import SchedulePopoverPanel from './ScheduleUsersPopover';
+import {
+  getCalendarDays,
+  getDateRange,
+  dayNames,
+  monthNames,
+} from '@/lib/dates';
+import { isSameDay } from 'date-fns';
 
 type Props = {
   doctors: User[];
@@ -11,22 +19,6 @@ type Props = {
   currentDate: Date;
   setCurrentDate: React.Dispatch<React.SetStateAction<Date>>;
 };
-
-const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-const monthNames = [
-  'Январь',
-  'Февраль',
-  'Март',
-  'Апрель',
-  'Май',
-  'Июнь',
-  'Июль',
-  'Август',
-  'Сентябрь',
-  'Октябрь',
-  'Ноябрь',
-  'Декабрь',
-];
 
 const DepartmentScheduleCalendar: React.FC<Props> = ({
   doctors,
@@ -42,51 +34,160 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
     users: UserWithSchedule[];
   } | null>(null);
 
+  // New state for drag selection
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartDate, setDragStartDate] = useState<Date | null>(null);
+  const [dragEndDate, setDragEndDate] = useState<Date | null>(null);
+
+  const calendarRef = useRef<HTMLDivElement>(null);
+  const dayElementsRef = useRef<Map<string, HTMLElement>>(new Map());
+
+  // Get date from element
+  const getDateFromElement = (element: HTMLElement): Date | null => {
+    const dateStr = element.dataset.date;
+    return dateStr ? new Date(dateStr) : null;
+  };
+
+  // Get element under coordinates
+  const getElementUnderPoint = (x: number, y: number): HTMLElement | null => {
+    const element = document.elementFromPoint(x, y);
+    return element?.closest('[data-date]') as HTMLElement | null;
+  };
+
+  // Check if date is in drag range
+  const isDateInDragRange = (date: Date): boolean => {
+    if (!isDragging || !dragStartDate || !dragEndDate) return false;
+    const time = date.getTime();
+    const startTime = Math.min(dragStartDate.getTime(), dragEndDate.getTime());
+    const endTime = Math.max(dragStartDate.getTime(), dragEndDate.getTime());
+    return time >= startTime && time <= endTime;
+  };
+
+  // Check if date is in selected range
+  const isDateInSelectedRange = (date: Date): boolean => {
+    return selectedDates.some((d) => isSameDay(d, date));
+  };
+
+  // Reset selection and panel
+  const resetSelection = () => {
+    setSelectedDates([]);
+    setOpenPanelInfo(null);
+  };
+
+  // Click outside handler
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(event.target as Node)
+      ) {
+        resetSelection();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Drag gesture handler
+  const bind = useDrag(
+    ({ down, xy: [x, y], initial: [initialX, initialY] }) => {
+      if (!down) {
+        // End drag
+        if (isDragging && dragStartDate && dragEndDate) {
+          const rangeDates = getDateRange(dragStartDate, dragEndDate);
+          setSelectedDates(rangeDates);
+
+          // Open panel for the last selected date
+          const lastDate = rangeDates[rangeDates.length - 1];
+          const lastDateStr = lastDate.toISOString().split('T')[0];
+          const lastElement = dayElementsRef.current.get(lastDateStr);
+
+          if (lastElement) {
+            const dayUsers = getScheduleForDate(lastDate);
+            setOpenPanelInfo({
+              referenceElement: lastElement,
+              users: dayUsers,
+            });
+          }
+        }
+
+        setIsDragging(false);
+        setDragStartDate(null);
+        setDragEndDate(null);
+        return;
+      }
+
+      // Start or continue drag
+      const currentElement = getElementUnderPoint(x, y);
+      if (!currentElement) return;
+
+      const currentDate = getDateFromElement(currentElement);
+      if (!currentDate) return;
+
+      if (!isDragging) {
+        // Start drag - Reset states when new drag starts
+        const initialElement = getElementUnderPoint(initialX, initialY);
+        const initialDate = initialElement
+          ? getDateFromElement(initialElement)
+          : null;
+
+        if (initialDate) {
+          // Reset dates and panel info when starting a new drag
+          resetSelection();
+
+          setIsDragging(true);
+          setDragStartDate(initialDate);
+          setDragEndDate(currentDate);
+        }
+      } else {
+        // Continue drag
+        setDragEndDate(currentDate);
+      }
+    },
+    {
+      filterTaps: true,
+      threshold: 5,
+    }
+  );
+
   const handleDayClick = (
     referenceElement: HTMLElement,
     date: Date,
     users: UserWithSchedule[]
   ) => {
-    if (selectedDates.some((d) => d.getTime() === date.getTime())) {
-      setSelectedDates((dates) =>
-        dates.filter((d) => d.getTime() !== date.getTime())
-      );
-      setOpenPanelInfo(null);
-    } else {
-      setSelectedDates([date]);
-      setOpenPanelInfo({
-        referenceElement,
-        users,
-      });
+    if (isDragging) return; // Ignore clicks during drag
+
+    // Unselect if only one cell and is already selected
+    if (selectedDates.length === 1 && isSameDay(selectedDates[0], date)) {
+      resetSelection();
+      return;
     }
+
+    // Reset entire range select and select the date
+    resetSelection();
+    setSelectedDates([date]);
+    setOpenPanelInfo({
+      referenceElement,
+      users,
+    });
   };
 
+  // Reset when changing departments or selected month
   useEffect(() => {
-    setSelectedDates([]);
-    setOpenPanelInfo(null);
+    resetSelection();
+    setIsDragging(false);
+    setDragStartDate(null);
+    setDragEndDate(null);
   }, [selectedDepartmentId, currentDate]);
 
   // Generate calendar days
-  const calendarDays = useMemo(() => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const startDate = new Date(firstDay);
-
-    // Adjust to start from Monday
-    const dayOfWeek = (firstDay.getDay() + 6) % 7;
-    startDate.setDate(startDate.getDate() - dayOfWeek);
-
-    const days = [];
-    const current = new Date(startDate);
-
-    for (let i = 0; i < 42; i++) {
-      days.push(new Date(current));
-      current.setDate(current.getDate() + 1);
-    }
-
-    return days;
-  }, [currentDate]);
+  const calendarDays = useMemo(
+    () => getCalendarDays(currentDate),
+    [currentDate]
+  );
 
   // Get schedule for a specific date
   const getScheduleForDate = (date: Date): UserWithSchedule[] => {
@@ -146,7 +247,7 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
         </div>
 
         {/* Calendar Grid */}
-        <div className="p-1 sm:p-6">
+        <div className="p-1 sm:p-6 touch-none" ref={calendarRef} {...bind()}>
           {/* Day Headers */}
           <div className="grid grid-cols-7 gap-1 mb-3">
             {dayNames.map((day) => (
@@ -163,13 +264,24 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
           <div className="grid grid-cols-7 gap-1">
             {calendarDays.map((date, index) => {
               const isCurrentMonth = date.getMonth() === currentDate.getMonth();
-              const isToday = date.toDateString() === new Date().toDateString();
+              const isToday = isSameDay(date, new Date());
               const dayUsers = getScheduleForDate(date);
               const hasUsers = dayUsers.length > 0;
+              const dateStr = date.toLocaleDateString('en-CA');
+              const isSelected = isDateInSelectedRange(date);
+              const isInDragRange = isDateInDragRange(date);
 
               return (
                 <button
                   key={index}
+                  ref={(el) => {
+                    if (el) {
+                      dayElementsRef.current.set(dateStr, el);
+                    } else {
+                      dayElementsRef.current.delete(dateStr);
+                    }
+                  }}
+                  data-date={dateStr}
                   className={`
                     h-full w-full p-1 lg:p-3 min-h-20 rounded-lg text-left transition-all duration-200 relative focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
                     ${
@@ -178,14 +290,21 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
                         : 'text-gray-900 bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300'
                     }
                     ${
-                      isToday
-                        ? 'border-blue-400 bg-blue-50 hover:bg-blue-100'
+                      isInDragRange && !isSelected
+                        ? 'border-blue-200 ring-2 ring-blue-200'
                         : ''
                     }
+                    ${isToday && !isSelected ? 'bg-blue-200' : ''}
+                    ${isSelected ? 'border-blue-500 ring-2 ring-blue-500' : ''}
+                    ${isDragging ? 'select-none' : ''}
                   `}
                   onClick={(e) =>
                     handleDayClick(e.currentTarget, date, dayUsers)
                   }
+                  style={{
+                    userSelect: isDragging ? 'none' : 'auto',
+                    touchAction: 'none', // Prevent scrolling during drag
+                  }}
                 >
                   <div className="font-medium text-sm mb-auto">
                     {date.getDate()}
