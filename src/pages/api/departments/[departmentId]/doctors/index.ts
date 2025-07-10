@@ -24,7 +24,7 @@ export default async function handler(
       const { data, error } = await supabase
         .from('users')
         .select(
-          '*, doctor_data:doctors(specialization, department:departments(id, name))'
+          '*, doctor_data:doctors!inner(specialization, department:departments!inner(id, name))'
         )
         .neq('id', user.id)
         .order('first_name', { ascending: true });
@@ -34,7 +34,7 @@ export default async function handler(
       }
 
       const filteredDoctors = data.filter(
-        (doctor) => doctor.doctor_data.department_id === departmentId
+        (doctor) => doctor.doctor_data.department.id === Number(departmentId)
       );
 
       return res.status(200).json(filteredDoctors);
