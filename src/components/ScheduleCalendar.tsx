@@ -1,5 +1,9 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
-import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react';
+import {
+  CaretLeftIcon,
+  CaretRightIcon,
+  IslandIcon,
+} from '@phosphor-icons/react';
 import { useDrag } from '@use-gesture/react';
 import type { KeyedMutator } from 'swr';
 import SchedulePopoverPanel from './ScheduleUsersPopover';
@@ -11,12 +15,15 @@ import {
 } from '@/lib/dates';
 import { isSameDay } from 'date-fns';
 import ChangeScheduleModal from './modals/ChangeScheduleModal';
+import SetHolidayModal from './modals/SetHolidayModal';
 
 type Props = {
   doctors: User[];
   selectedDepartmentId: number | null;
   schedules: DepartmentDateSchedule[] | undefined;
   mutateSchedules: KeyedMutator<DepartmentDateSchedule[]>;
+  holidays: Holiday[];
+  mutateHolidays: KeyedMutator<Holiday[]>;
   currentDate: Date;
   setCurrentDate: React.Dispatch<React.SetStateAction<Date>>;
 };
@@ -26,6 +33,8 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
   selectedDepartmentId,
   schedules,
   mutateSchedules,
+  holidays,
+  mutateHolidays,
   currentDate,
   setCurrentDate,
 }) => {
@@ -37,6 +46,7 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
   const [scheduleModalInfo, setScheduleModalInfo] = useState<{
     selectedDoctor: User;
   } | null>(null);
+  const [holidayModalOpen, setHolidayModalOpen] = useState(false);
 
   // New state for drag selection
   const [isDragging, setIsDragging] = useState(false);
@@ -46,6 +56,7 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
   const calendarRef = useRef<HTMLDivElement>(null);
   const dayElementsRef = useRef<Map<string, HTMLElement>>(new Map());
   const schedulesPopoverRef = useRef<HTMLDivElement>(null);
+  const addHolidaysButtonRef = useRef<HTMLButtonElement>(null);
 
   // Get date from element
   const getDateFromElement = (element: HTMLElement): Date | null => {
@@ -90,15 +101,16 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
     setOpenPanelInfo(null);
   };
 
-  // Click outside handler
+  // Closing handlers
   useEffect(() => {
     const handleClickOutside = (event: PointerEvent) => {
-      if (scheduleModalInfo) return;
+      if (scheduleModalInfo || holidayModalOpen) return;
 
       if (
         calendarRef.current &&
         !calendarRef.current.contains(event.target as Node) &&
-        !schedulesPopoverRef.current?.contains(event.target as Node)
+        !schedulesPopoverRef.current?.contains(event.target as Node) &&
+        !addHolidaysButtonRef.current?.contains(event.target as Node)
       ) {
         resetSelection();
       }
@@ -116,7 +128,7 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
       document.removeEventListener('pointerdown', handleClickOutside);
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [scheduleModalInfo]);
+  }, [scheduleModalInfo, holidayModalOpen]);
 
   // Drag gesture handler
   const bind = useDrag(
@@ -262,14 +274,18 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
 
           {/* Legend */}
           <div className="flex items-center justify-evenly space-x-3 sm:space-x-6 text-xs sm:text-sm text-gray-600 mt-4 sm:mt-0">
-            <div className="flex items-center space-x-1 sm:space-x-2">
-              <div className="w-3 h-3 bg-blue-100 border border-blue-300 rounded-full"></div>
-              <span className="w-max">Рабочий день</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-gray-100 border border-gray-300 rounded-full"></div>
-              <span className="w-max">Выходной</span>
-            </div>
+            <button
+              type="button"
+              onClick={() => {
+                resetSelection();
+                setHolidayModalOpen(true);
+              }}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-100 text-gray-700 hover:bg-gray-200 transition"
+              ref={addHolidaysButtonRef}
+            >
+              <IslandIcon className="w-5 h-5" />
+              <span>Добавить праздничные дни</span>
+            </button>
           </div>
         </div>
 
@@ -280,7 +296,11 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
             {dayNames.map((day) => (
               <div
                 key={day}
-                className="p-1 text-center text-sm font-medium text-gray-500"
+                className={`${
+                  day === 'Сб' || day === 'Вс'
+                    ? 'text-amber-700'
+                    : 'text-gray-500'
+                } p-1 text-center text-sm font-medium`}
               >
                 {day}
               </div>
@@ -291,12 +311,26 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
           <div className="grid grid-cols-7 gap-1" ref={calendarRef}>
             {calendarDays.map((date, index) => {
               const isCurrentMonth = date.getMonth() === currentDate.getMonth();
-              const isToday = isSameDay(date, new Date());
               const dayUsers = getScheduleForDate(date);
               const hasUsers = dayUsers.length > 0;
               const dateStr = date.toLocaleDateString('en-CA');
               const isSelected = isDateInSelectedRange(date);
               const isInDragRange = isDateInDragRange(date);
+              const isHoliday = holidays.some((day) => day.date === dateStr);
+              const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+              let bgClass = '';
+              if (isHoliday) {
+                bgClass =
+                  'bg-emerald-100 text-emerald-800 font-semibold hover:bg-emerald-200 border border-emerald-200';
+              } else if (!isCurrentMonth) {
+                bgClass = 'bg-gray-50 text-gray-300';
+              } else if (isWeekend) {
+                bgClass =
+                  'bg-amber-50 text-amber-700 font-medium hover:bg-amber-100';
+              } else {
+                bgClass =
+                  'bg-white text-gray-700 hover:bg-gray-50 border border-gray-100';
+              }
 
               return (
                 <button
@@ -311,22 +345,17 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
                   data-date={dateStr}
                   className={`
                     h-full w-full p-1 lg:p-3 min-h-20 rounded-lg text-left transition-all duration-200 relative focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
-                    ${
-                      isToday && isCurrentMonth && !isSelected
-                        ? 'bg-blue-200'
-                        : ''
-                    }
+                    ${bgClass}
                     ${
                       !isCurrentMonth
-                        ? 'text-gray-300 bg-gray-50 hover:bg-gray-100'
-                        : `text-gray-900 bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300`
+                        ? ''
+                        : 'border border-gray-200 hover:border-gray-300'
                     }
                     ${
                       isInDragRange && !isSelected
                         ? 'border-blue-200 ring-2 ring-blue-200'
                         : ''
                     }
-                    
                     ${isSelected ? 'border-blue-500 ring-2 ring-blue-500' : ''}
                     ${isDragging ? 'select-none' : ''}
                   `}
@@ -381,6 +410,8 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
             setScheduleModalInfo({ selectedDoctor: doctor });
           }}
           onClose={() => setOpenPanelInfo(null)}
+          holidays={holidays}
+          mutateHolidays={mutateHolidays}
           ref={schedulesPopoverRef}
         />
       )}
@@ -391,7 +422,17 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
           doctor={scheduleModalInfo.selectedDoctor}
           mutateSchedules={mutateSchedules}
           isOpen={Boolean(scheduleModalInfo)}
+          // internally used only for closing
           setIsOpen={() => setScheduleModalInfo(null)}
+        />
+      )}
+      {holidayModalOpen && (
+        <SetHolidayModal
+          selectedDates={selectedDates}
+          setSelectedDates={setSelectedDates}
+          mutateHolidays={mutateHolidays}
+          isOpen={holidayModalOpen}
+          setIsOpen={setHolidayModalOpen}
         />
       )}
     </>

@@ -10,6 +10,8 @@ type Props = {
   setSelectedDepartmentId: (id: number | null) => void;
   schedules: DepartmentDateSchedule[] | undefined;
   mutateSchedules: KeyedMutator<DepartmentDateSchedule[]>;
+  holidays: Holiday[];
+  mutateHolidays: KeyedMutator<Holiday[]>;
   isLoading: boolean;
   selectedDate: Date;
   setSelectedDate: React.Dispatch<React.SetStateAction<Date>>;
@@ -22,6 +24,8 @@ const ScheduleControlPage = ({
   setSelectedDepartmentId,
   schedules,
   mutateSchedules,
+  holidays,
+  mutateHolidays,
   isLoading,
   selectedDate,
   setSelectedDate,
@@ -62,6 +66,8 @@ const ScheduleControlPage = ({
               selectedDepartmentId={selectedDepartmentId}
               schedules={schedules}
               mutateSchedules={mutateSchedules}
+              holidays={holidays}
+              mutateHolidays={mutateHolidays}
               currentDate={selectedDate}
               setCurrentDate={setSelectedDate}
             />

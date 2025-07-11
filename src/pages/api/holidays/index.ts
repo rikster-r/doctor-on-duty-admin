@@ -13,7 +13,7 @@ export default async function handler(
   }
 
   if (req.method === 'POST') {
-    const { dates }: { dates: Date[] } = req.body;
+    const { dates }: { dates: string[] } = req.body;
 
     for (const date of dates) {
       if (!date) {
@@ -23,9 +23,7 @@ export default async function handler(
 
     try {
       const { error } = await supabase.from('holidays').upsert(
-        dates.map((date) => ({
-          date: date.toISOString().split('T')[0], // 'YYYY-MM-DD'
-        })),
+        dates.map((date) => ({ date })),
         {
           onConflict: 'date',
         }
@@ -43,20 +41,17 @@ export default async function handler(
         .json({ message: 'Ошибка сервера', error: (error as Error).message });
     }
   } else if (req.method === 'DELETE') {
-    const { dates }: { dates: Date[] } = req.body;
+    const { dates }: { dates: string[] } = req.body;
 
     if (!dates || !Array.isArray(dates)) {
       return res.status(400).json({ error: 'Некорректные данные' });
     }
-    const formattedDates = dates.map(
-      (date) => date.toISOString().split('T')[0]
-    );
 
     try {
       const { error } = await supabase
         .from('holidays')
         .delete()
-        .in('date', formattedDates); // 'YYYY-MM-DD'
+        .in('date', dates);
 
       if (error) {
         throw new Error(error.message);
@@ -83,7 +78,7 @@ export default async function handler(
         throw new Error(error.message);
       }
 
-      return res.status(200).json({ data });
+      return res.status(200).json(data);
     } catch (error) {
       console.error(error);
       return res

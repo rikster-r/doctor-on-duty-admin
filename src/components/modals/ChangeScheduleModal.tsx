@@ -47,8 +47,7 @@ const ChangeScheduleModal = ({
         const data = await res.json();
         throw new Error(data.error);
       }
-
-      toast.success(`График доктора успешно изменен`);
+      
       mutateSchedules();
       handleClose();
     } catch (error) {
@@ -78,7 +77,6 @@ const ChangeScheduleModal = ({
         throw new Error(data.error);
       }
 
-      toast.success(`График доктора успешно очищен`);
       mutateSchedules();
       handleClose();
     } catch (error) {

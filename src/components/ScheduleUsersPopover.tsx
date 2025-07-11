@@ -1,4 +1,4 @@
-import React, { useEffect, forwardRef } from 'react';
+import React, { useEffect, forwardRef, useState } from 'react';
 import {
   useFloating,
   flip,
@@ -6,8 +6,15 @@ import {
   shift,
   autoUpdate,
 } from '@floating-ui/react';
-import { ClockIcon, PlusIcon, UserIcon } from '@phosphor-icons/react';
+import {
+  ClockIcon,
+  PlusIcon,
+  UserIcon,
+  TrashIcon,
+} from '@phosphor-icons/react';
 import UserImage from './UserImage';
+import { KeyedMutator } from 'swr';
+import { toast } from 'react-toastify';
 
 type Props = {
   allDoctors: User[];
@@ -16,12 +23,31 @@ type Props = {
   referenceElement: HTMLElement | null;
   onClose?: () => void;
   onDoctorClick: (doctor: User) => void;
+  holidays: Holiday[];
+  mutateHolidays: KeyedMutator<Holiday[]>;
 };
 
 const ScheduleUsersPopover = forwardRef<HTMLDivElement, Props>(
-  ({ dates, dayUsers, allDoctors, referenceElement, onDoctorClick }, ref) => {
+  (
+    {
+      dates,
+      dayUsers,
+      allDoctors,
+      referenceElement,
+      onDoctorClick,
+      holidays,
+      mutateHolidays,
+    },
+    ref
+  ) => {
+    const [isDeleting, setIsDeleting] = useState(false);
+
     const hasUsers = dayUsers.length > 0;
     const scheduledUsers = dayUsers.filter((user) => user.schedule);
+    const currentHoliday = holidays.find(
+      (day) => day.date === dates[0].toLocaleDateString('en-CA')
+    );
+    const isHoliday = Boolean(currentHoliday);
 
     const { refs, floatingStyles, update } = useFloating({
       placement: 'bottom-start',
@@ -91,6 +117,47 @@ const ScheduleUsersPopover = forwardRef<HTMLDivElement, Props>(
         .join(', ');
     };
 
+    const handleDeleteHoliday = async () => {
+      if (!currentHoliday) return;
+
+      setIsDeleting(true);
+      try {
+        console.log(dates);
+        const res = await fetch('/api/holidays', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            dates: dates.map((date) => date.toLocaleDateString('en-CA')),
+          }),
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error);
+        }
+
+        // Update the holidays list by removing the deleted holiday
+        await mutateHolidays(
+          (currentHolidays) =>
+            currentHolidays?.filter(
+              (holiday) => holiday.id !== currentHoliday.id
+            ) || [],
+          { revalidate: true }
+        );
+      } catch (error) {
+        console.error('Error deleting holiday:', error);
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : 'Не удалось удалить праздничный день'
+        );
+      } finally {
+        setIsDeleting(false);
+      }
+    };
+
     return (
       <div
         ref={(el) => {
@@ -111,7 +178,31 @@ const ScheduleUsersPopover = forwardRef<HTMLDivElement, Props>(
             </h4>
           </div>
 
-          {hasUsers ? (
+          {isHoliday && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-sm text-green-800 font-medium">
+                    Праздничный день
+                  </span>
+                </div>
+                <button
+                  onClick={handleDeleteHoliday}
+                  disabled={isDeleting}
+                  className="flex items-center space-x-1 px-2 py-1 text-xs text-red-600 hover:text-red-800 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Удалить праздничный день"
+                >
+                  <TrashIcon className="w-4 h-4" />
+                  <span className="text-xs font-medium">
+                    {isDeleting ? 'Удаление...' : 'Удалить'}
+                  </span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {!isHoliday && hasUsers && (
             <div className="space-y-3">
               <div className="text-sm text-gray-600">
                 {dates.length === 1
@@ -171,7 +262,8 @@ const ScheduleUsersPopover = forwardRef<HTMLDivElement, Props>(
                 )}
               </div>
             </div>
-          ) : (
+          )}
+          {!isHoliday && !hasUsers && (
             <div className="text-center py-4 text-gray-500">
               <UserIcon className="w-8 h-8 mx-auto mb-2 text-gray-400" />
               <p className="text-sm">В этом отделении никто не работает</p>

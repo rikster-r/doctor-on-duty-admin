@@ -57,3 +57,9 @@ type NotificationPushToken = {
   is_active: boolean;
   created_at: string;
 };
+
+type Holiday = {
+  id: number;
+  date: string;
+  created_at: string;
+};

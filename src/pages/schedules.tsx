@@ -60,9 +60,31 @@ function Schedules({ initialDepartmentId }: Props) {
     `/api/departments/${selectedDepartmentId}/doctors`,
     fetcher
   );
+  const monthStart = new Date(
+    selectedDate.getFullYear(),
+    selectedDate.getMonth(),
+    1
+  ).toLocaleDateString('en-CA');
+  const monthEnd = new Date(
+    selectedDate.getFullYear(),
+    selectedDate.getMonth() + 1,
+    0
+  ).toLocaleDateString('en-CA');
+
+  const {
+    data: holidays,
+    isLoading: isHolidaysLoading,
+    mutate: mutateHolidays,
+  } = useSWR<Holiday[]>(
+    `api/holidays?start=${monthStart}&end=${monthEnd}`,
+    fetcher
+  );
 
   const isLoading =
-    isSchedulesLoading || isDepartmentsLoading || isDoctorsLoading;
+    isSchedulesLoading ||
+    isDepartmentsLoading ||
+    isDoctorsLoading ||
+    isHolidaysLoading;
 
   return (
     <SchedulesDashboard
@@ -74,6 +96,8 @@ function Schedules({ initialDepartmentId }: Props) {
       setSelectedDate={setSelectedDate}
       schedules={schedules}
       mutateSchedules={mutateSchedules}
+      holidays={holidays ?? []}
+      mutateHolidays={mutateHolidays}
       isLoading={isLoading}
     />
   );
