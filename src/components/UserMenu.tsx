@@ -1,5 +1,5 @@
 import { Menu, MenuItems, MenuItem, MenuButton } from '@headlessui/react';
-import { DotsThreeVertical, Key, ImageSquare } from 'phosphor-react';
+import { DotsThreeVertical, Key, ImageSquare } from '@phosphor-icons/react';
 
 type Props = {
   openChangePasswordModal: (open: boolean) => void;

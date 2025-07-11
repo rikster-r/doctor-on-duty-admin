@@ -3,7 +3,7 @@ import Layout from './Layout';
 import { fetcher } from '@/lib/fetcher';
 import useSWR from 'swr';
 import React, { useState } from 'react';
-import { Plus } from 'phosphor-react';
+import { PlusIcon } from '@phosphor-icons/react';
 import EditDepartmentModal from './modals/EditDepartmentModal';
 import AddDepartmentModal from './modals/AddDepartmentModal';
 import { useUser } from '@/hooks/useUser';
@@ -45,7 +45,7 @@ const DepartmentsDashboard = () => {
                 className="flex items-center gap-2 bg-blue-500 text-white p-2 sm:px-4 sm:py-3 rounded-full hover:bg-blue-600"
                 onClick={() => setAddDepartmentModalOpen(true)}
               >
-                <Plus size={18} />
+                <PlusIcon size={18} />
                 <span className="hidden sm:block">Добавить отделение</span>
               </button>
             </div>

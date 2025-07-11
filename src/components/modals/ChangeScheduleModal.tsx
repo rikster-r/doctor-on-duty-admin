@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import BaseModal from './BaseModal';
-import { X, CaretLeft } from 'phosphor-react';
+import { X, CaretLeft } from '@phosphor-icons/react';
 import { DialogTitle } from '@headlessui/react';
 import { toast } from 'react-toastify';
 import { KeyedMutator } from 'swr';

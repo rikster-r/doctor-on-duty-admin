@@ -5,7 +5,7 @@ import {
   Trash,
   NotePencil,
   Share,
-} from 'phosphor-react';
+} from '@phosphor-icons/react';
 import Layout from './Layout';
 import { fetcher } from '@/lib/fetcher';
 import useSWR from 'swr';

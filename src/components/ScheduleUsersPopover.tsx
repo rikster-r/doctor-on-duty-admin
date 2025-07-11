@@ -6,7 +6,7 @@ import {
   shift,
   autoUpdate,
 } from '@floating-ui/react';
-import { Clock, Plus, User as UserIcon } from 'phosphor-react';
+import { ClockIcon, PlusIcon, UserIcon } from '@phosphor-icons/react';
 import UserImage from './UserImage';
 
 type Props = {
@@ -154,7 +154,7 @@ const ScheduleUsersPopover = forwardRef<HTMLDivElement, Props>(
                         </div>
                         {isScheduled && user.schedule ? (
                           <div className="flex items-center space-x-1 text-xs text-gray-600">
-                            <Clock className="w-3 h-3" />
+                            <ClockIcon className="w-3 h-3" />
                             <span>
                               {formatTime(user.schedule.start_time)}-
                               {formatTime(user.schedule.end_time)}
@@ -162,7 +162,7 @@ const ScheduleUsersPopover = forwardRef<HTMLDivElement, Props>(
                           </div>
                         ) : (
                           <div className="px-1">
-                            <Plus className="w-3 h-3" />
+                            <PlusIcon className="w-3 h-3" />
                           </div>
                         )}
                       </button>

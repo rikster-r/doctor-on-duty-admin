@@ -7,7 +7,7 @@ import {
   NotePencil,
   Trash,
   DotsSixVertical,
-} from 'phosphor-react';
+} from '@phosphor-icons/react';
 import { useUser } from '@/hooks/useUser';
 
 type Props = {

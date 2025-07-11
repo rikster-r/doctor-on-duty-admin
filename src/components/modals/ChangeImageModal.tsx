@@ -2,7 +2,7 @@ import { DialogTitle } from '@headlessui/react';
 import { useState, useRef, useCallback } from 'react';
 import AvatarEditor from 'react-avatar-editor';
 import { useDropzone } from 'react-dropzone';
-import { Upload, X, CaretLeft } from 'phosphor-react';
+import { Upload, X, CaretLeft } from '@phosphor-icons/react';
 import { toast } from 'react-toastify';
 import { KeyedMutator } from 'swr';
 import BaseModal from './BaseModal';

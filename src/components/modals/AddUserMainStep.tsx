@@ -1,5 +1,5 @@
 import { useUser } from '@/hooks/useUser';
-import { CaretDown, Eye, EyeClosed } from 'phosphor-react';
+import { CaretDown, Eye, EyeClosed } from '@phosphor-icons/react';
 import { useState } from 'react';
 
 type FormDataType = {

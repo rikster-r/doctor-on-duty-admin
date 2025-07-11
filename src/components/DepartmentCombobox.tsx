@@ -6,7 +6,7 @@ import {
   ComboboxOptions,
   ComboboxOption,
 } from '@headlessui/react';
-import { CaretDown, Check } from 'phosphor-react';
+import { CaretDownIcon, CheckIcon } from '@phosphor-icons/react';
 import { Fragment, useState } from 'react';
 import DepartmentImage from './DepartmentImage';
 
@@ -76,7 +76,7 @@ const DepartmentCombobox = ({
               placeholder={placeholder}
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-2">
-              <CaretDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+              <CaretDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
             </div>
           </ComboboxButton>
           <Transition
@@ -113,7 +113,7 @@ const DepartmentCombobox = ({
                               focus ? 'text-white' : 'text-blue-600'
                             }`}
                           >
-                            <Check className="h-5 w-5" aria-hidden="true" />
+                            <CheckIcon className="h-5 w-5" aria-hidden="true" />
                           </span>
                         ) : null}
                         <div className="flex items-center">

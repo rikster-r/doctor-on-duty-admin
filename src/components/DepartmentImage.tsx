@@ -1,4 +1,4 @@
-import { ImageSquare } from 'phosphor-react';
+import { ImageSquareIcon } from '@phosphor-icons/react';
 import { CldImage } from 'next-cloudinary';
 
 interface DepartmentImageProps {
@@ -38,7 +38,7 @@ export default function DepartmentImage({
           />
         </div>
       ) : (
-        <ImageSquare
+        <ImageSquareIcon
           className="text-gray-600 mx-auto"
           size={Math.min(width, height) / 2}
         />

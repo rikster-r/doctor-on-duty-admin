@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Dialog, DialogBackdrop, DialogPanel } from '@headlessui/react';
 import Sidebar from './Sidebar';
 import Head from 'next/head';
-import { List, X } from 'phosphor-react';
+import { ListIcon, XIcon } from '@phosphor-icons/react';
 
 type Props = { children: React.ReactNode; title: string; description: string };
 
@@ -22,7 +22,7 @@ const Layout = ({ children, title, description }: Props) => {
         <header className="lg:hidden w-full px-6 py-3 flex items-center bg-white text-blue-800 shadow sticky top-0 z-40">
           <div className="text-lg font-semibold">Дежурный доктор</div>
           <button className="ml-auto" onClick={openSidebar}>
-            <List size={20} />
+            <ListIcon size={20} />
           </button>
           <Dialog
             as="div"
@@ -34,7 +34,7 @@ const Layout = ({ children, title, description }: Props) => {
             <DialogPanel className="fixed inset-y-0 right-0 bg-white shadow-md">
               <div className="flex justify-end p-4">
                 <button onClick={closeSidebar} className="text-gray-400">
-                  <X className="h-6 w-6" />
+                  <XIcon className="h-6 w-6" />
                 </button>
               </div>
               <Sidebar />

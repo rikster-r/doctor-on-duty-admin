@@ -1,4 +1,9 @@
-import { FirstAid, SignOut, UserCircle, CalendarBlank } from 'phosphor-react';
+import {
+  FirstAidIcon,
+  SignOutIcon,
+  UserCircleIcon,
+  CalendarBlankIcon,
+} from '@phosphor-icons/react';
 import { useUser } from '@/hooks/useUser';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -21,7 +26,7 @@ const Sidebar = () => {
               : 'hover:bg-blue-50'
           } flex items-center gap-3 px-4 py-3 rounded-xl`}
         >
-          <UserCircle size={20} weight="bold" />
+          <UserCircleIcon size={20} weight="bold" />
           <span className="text-sm">Пользователи</span>
         </Link>
         <Link
@@ -32,7 +37,7 @@ const Sidebar = () => {
               : 'hover:bg-blue-50'
           } flex items-center gap-3 px-4 py-3 rounded-xl`}
         >
-          <FirstAid size={20} weight="bold" />
+          <FirstAidIcon size={20} weight="bold" />
           <span className="text-sm">Отделения</span>
         </Link>
         <Link
@@ -43,14 +48,14 @@ const Sidebar = () => {
               : 'hover:bg-blue-50'
           } flex items-center gap-3 px-4 py-3 rounded-xl`}
         >
-          <CalendarBlank size={20} weight="bold" />
+          <CalendarBlankIcon size={20} weight="bold" />
           <span className="text-sm">Графики</span>
         </Link>
         <button
           onClick={logout}
           className={`hover:bg-blue-50 flex items-center gap-3 px-4 py-3 rounded-xl`}
         >
-          <SignOut size={20} weight="bold" />
+          <SignOutIcon size={20} weight="bold" />
           <span className="text-sm">Выйти</span>
         </button>
       </nav>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Eye, EyeClosed } from 'phosphor-react';
+import { Eye, EyeClosed } from '@phosphor-icons/react';
 import { toast } from 'react-toastify';
 import { useUser } from '@/hooks/useUser';
 import { GetServerSidePropsContext } from 'next';

@@ -1,5 +1,5 @@
 import { CldImage } from 'next-cloudinary';
-import { PencilSimple, UserCircle } from 'phosphor-react';
+import { PencilSimple, UserCircle } from '@phosphor-icons/react';
 
 type Props = {
   photoUrl: string | undefined | null;

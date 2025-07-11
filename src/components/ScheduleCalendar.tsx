@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState, useRef } from 'react';
-import { CaretLeft, CaretRight } from 'phosphor-react';
+import { CaretLeftIcon, CaretRightIcon } from '@phosphor-icons/react';
 import { useDrag } from '@use-gesture/react';
 import type { KeyedMutator } from 'swr';
 import SchedulePopoverPanel from './ScheduleUsersPopover';
@@ -247,7 +247,7 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
               onClick={handlePrevMonth}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             >
-              <CaretLeft className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+              <CaretLeftIcon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             </button>
             <h2 className="text-base sm:text-lg font-semibold text-gray-900 w-[150px] text-center">
               {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
@@ -256,7 +256,7 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
               onClick={handleNextMonth}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
             >
-              <CaretRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
+              <CaretRightIcon className="w-4 h-4 sm:w-5 sm:h-5 text-gray-600" />
             </button>
           </div>
 

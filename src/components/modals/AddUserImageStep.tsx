@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { Upload, X } from 'phosphor-react';
+import { Upload, X } from '@phosphor-icons/react';
 import AvatarEditor from 'react-avatar-editor';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-toastify';

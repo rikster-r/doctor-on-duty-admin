@@ -1,7 +1,7 @@
 import { useState} from 'react';
 import BaseModal from './BaseModal';
 import { DialogTitle } from '@headlessui/react';
-import { X } from 'phosphor-react';
+import { X } from '@phosphor-icons/react';
 import { toast } from 'react-toastify';
 import { KeyedMutator } from 'swr';
 import RowFileInput from '../RowFileInput';
