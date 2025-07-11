@@ -18,6 +18,7 @@ import ChangePasswordModal from './modals/ChangePasswordModal';
 import ChangeImageModal from './modals/ChangeImageModal';
 import UserImage from './UserImage';
 import { useRouter } from 'next/router';
+import DeleteConfirmModal from './modals/DeleteConfirmModal';
 
 const pageSize = 50;
 
@@ -57,6 +58,7 @@ export default function UsersDashboard() {
   const [editUserModalOpen, setEditUserModalOpen] = useState(false);
   const [changePasswordModalOpen, setChangePasswordModalOpen] = useState(false);
   const [changeImageModalOpen, setChangeImageModalOpen] = useState(false);
+  const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const deleteUser = async (id: number) => {
@@ -233,7 +235,10 @@ export default function UsersDashboard() {
                           <button
                             aria-label="Удалить пользователя"
                             className="text-red-500 hover:text-red-700 transition-colors duration-150"
-                            onClick={() => deleteUser(user.id)}
+                            onClick={() => {
+                              setDeleteConfirmModalOpen(true);
+                              setSelectedUser(user);
+                            }}
                             title="Удалить пользователя"
                           >
                             <Trash size={18} weight="bold" />
@@ -301,6 +306,20 @@ export default function UsersDashboard() {
             setIsOpen={setChangeImageModalOpen}
             user={selectedUser}
             mutateUsers={mutateUsers}
+          />
+        )}
+        {deleteConfirmModalOpen && (
+          <DeleteConfirmModal
+            isOpen={deleteConfirmModalOpen}
+            setIsOpen={setDeleteConfirmModalOpen}
+            onConfirm={() => deleteUser((selectedUser as User).id)}
+            message={`Вы уверены, что хотите удалить пользователя ${[
+              selectedUser?.first_name,
+              selectedUser?.middle_name,
+              selectedUser?.last_name,
+            ]
+              .filter(Boolean)
+              .join(' ')}? Это действие нельзя отменить.`}
           />
         )}
       </main>

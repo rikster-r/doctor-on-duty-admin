@@ -75,6 +75,7 @@ const DepartmentsDashboard = () => {
         {!isLoading && departments && departments.length > 0 && (
           <DepartmentsSortableList
             departments={departments}
+            selectedDepartment={selectedDepartment}
             setSelectedDepartment={setSelectedDepartment}
             setEditDepartmentModalOpen={setEditDepartmentModalOpen}
             mutate={mutateDepartments}

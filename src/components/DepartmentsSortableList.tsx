@@ -1,12 +1,14 @@
 import { toast } from 'react-toastify';
 import { DndContext, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext } from '@dnd-kit/sortable';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import SortableDepartmentItem from './SortableDepartmentItem';
 import { KeyedMutator } from 'swr';
+import DeleteConfirmModal from './modals/DeleteConfirmModal';
 
 type Props = {
   departments: Department[];
+  selectedDepartment: Department | undefined;
   setSelectedDepartment: (department: Department) => void;
   setEditDepartmentModalOpen: (open: boolean) => void;
   mutate: KeyedMutator<Department[]>;
@@ -14,10 +16,12 @@ type Props = {
 
 export function DepartmentsSortableList({
   departments,
+  selectedDepartment,
   setSelectedDepartment,
   setEditDepartmentModalOpen,
   mutate,
 }: Props) {
+  const [deleteConfirmModalOpen, setDeleteConfirmModalOpen] = useState(false);
   // departments are guaranteed to be sorted by order in backend
   const items = useMemo(() => departments.map((d) => d.id), [departments]);
 
@@ -82,20 +86,35 @@ export function DepartmentsSortableList({
   };
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
-      <SortableContext items={items}>
-        <div className="grid grid-cols-3 gap-2">
-          {departments.map((department) => (
-            <SortableDepartmentItem
-              key={department.id}
-              department={department}
-              setSelectedDepartment={setSelectedDepartment}
-              setEditDepartmentModalOpen={setEditDepartmentModalOpen}
-              deleteDepartment={deleteDepartment}
-            />
-          ))}
-        </div>
-      </SortableContext>
-    </DndContext>
+    <>
+      <DndContext onDragEnd={handleDragEnd}>
+        <SortableContext items={items}>
+          <div className="grid grid-cols-3 gap-2">
+            {departments.map((department) => (
+              <SortableDepartmentItem
+                key={department.id}
+                department={department}
+                setSelectedDepartment={setSelectedDepartment}
+                setEditDepartmentModalOpen={setEditDepartmentModalOpen}
+                openDeleteConfirmModal={() => {
+                  setSelectedDepartment(department);
+                  setDeleteConfirmModalOpen(true);
+                }}
+              />
+            ))}
+          </div>
+        </SortableContext>
+        {deleteConfirmModalOpen && (
+          <DeleteConfirmModal
+            isOpen={deleteConfirmModalOpen}
+            setIsOpen={setDeleteConfirmModalOpen}
+            onConfirm={() =>
+              deleteDepartment((selectedDepartment as Department).id)
+            }
+            message={`Вы уверены, что хотите удалить отделение ${selectedDepartment?.name}? Это действие нельзя отменить.`}
+          />
+        )}
+      </DndContext>
+    </>
   );
 }
