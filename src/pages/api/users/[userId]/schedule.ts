@@ -2,10 +2,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import createClient from '@/lib/postgre';
 import { getUserFromRequest } from '@/lib/auth';
 
-type ScheduleInput = {
-  date: Date; // 'YYYY-MM-DD'
-  start_time: Date; // 'HH:mm'
-  end_time: Date; // 'HH:mm'
+type POSTInput = {
+  dates: Date[];
+  start_time: string;
+  end_time: string;
 };
 
 export default async function handler(
@@ -24,29 +24,26 @@ export default async function handler(
   }
 
   if (req.method === 'POST') {
-    const { schedules }: { schedules: ScheduleInput[] } = req.body;
+    const { dates, start_time, end_time }: POSTInput = req.body;
 
-    for (const { date, start_time, end_time } of schedules) {
-      if (!date || !start_time || !end_time) {
-        return res.status(400).json({ error: 'Некорректные данные' });
-      }
-
-      if (start_time >= end_time) {
-        return res
-          .status(400)
-          .json({ error: 'Время начала должно быть меньше времени окончания' });
-      }
+    if (!dates || !dates.length || !start_time || !end_time) {
+      return res.status(400).json({ error: 'Некорректные данные' });
     }
+
+    if (start_time >= end_time) {
+      return res.status(400).json({
+        error: 'Конец смены должен быть позже начала.',
+      });
+    }
+
+    console.log(dates);
 
     try {
       const { error } = await supabase.from('schedules').upsert(
-        schedules.map((schedule) => ({
-          date: schedule.date.toISOString().split('T')[0], // 'YYYY-MM-DD'
-          start_time: schedule.start_time
-            .toISOString()
-            .split('T')[1]
-            .slice(0, 5), // 'HH:mm'
-          end_time: schedule.end_time.toISOString().split('T')[1].slice(0, 5), // 'HH:mm'
+        dates.map((date) => ({
+          date,
+          start_time,
+          end_time,
           user_id: userId,
         })),
         {
@@ -66,25 +63,18 @@ export default async function handler(
         .json({ message: 'Ошибка сервера', error: (error as Error).message });
     }
   } else if (req.method === 'DELETE') {
-    const { dates }: { dates: Date[] } = req.body;
+    const { dates }: { dates: string } = req.body;
 
     if (!dates || !Array.isArray(dates)) {
       return res.status(400).json({ error: 'Некорректные данные' });
     }
-
-    const formattedDates = dates.map(
-      (date) => date.toISOString().split('T')[0]
-    );
 
     try {
       const { error } = await supabase
         .from('schedules')
         .delete()
         .eq('user_id', userId)
-        .in(
-          'date',
-          formattedDates // 'YYYY-MM-DD'
-        );
+        .in('date', dates);
 
       if (error) {
         throw new Error(error.message);

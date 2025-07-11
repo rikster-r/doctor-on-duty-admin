@@ -10,6 +10,7 @@ import {
   monthNames,
 } from '@/lib/dates';
 import { isSameDay } from 'date-fns';
+import ChangeScheduleModal from './modals/ChangeScheduleModal';
 
 type Props = {
   doctors: User[];
@@ -24,7 +25,7 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
   doctors,
   selectedDepartmentId,
   schedules,
-  // mutateSchedules,
+  mutateSchedules,
   currentDate,
   setCurrentDate,
 }) => {
@@ -32,6 +33,9 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
   const [openPanelInfo, setOpenPanelInfo] = useState<{
     referenceElement: HTMLElement;
     users: UserWithSchedule[];
+  } | null>(null);
+  const [scheduleModalInfo, setScheduleModalInfo] = useState<{
+    selectedDoctor: User;
   } | null>(null);
 
   // New state for drag selection
@@ -41,6 +45,7 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
 
   const calendarRef = useRef<HTMLDivElement>(null);
   const dayElementsRef = useRef<Map<string, HTMLElement>>(new Map());
+  const schedulesPopoverRef = useRef<HTMLDivElement>(null);
 
   // Get date from element
   const getDateFromElement = (element: HTMLElement): Date | null => {
@@ -54,13 +59,24 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
     return element?.closest('[data-date]') as HTMLElement | null;
   };
 
-  // Check if date is in drag range
+  // Check if date is in drag range (accounting for timezone issues)
   const isDateInDragRange = (date: Date): boolean => {
     if (!isDragging || !dragStartDate || !dragEndDate) return false;
-    const time = date.getTime();
-    const startTime = Math.min(dragStartDate.getTime(), dragEndDate.getTime());
-    const endTime = Math.max(dragStartDate.getTime(), dragEndDate.getTime());
-    return time >= startTime && time <= endTime;
+    const start = dragStartDate < dragEndDate ? dragStartDate : dragEndDate;
+    const end = dragStartDate > dragEndDate ? dragStartDate : dragEndDate;
+    // Compare only the date part, ignoring time and timezone
+    const dateValue = Date.UTC(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    );
+    const startValue = Date.UTC(
+      start.getFullYear(),
+      start.getMonth(),
+      start.getDate()
+    );
+    const endValue = Date.UTC(end.getFullYear(), end.getMonth(), end.getDate());
+    return dateValue >= startValue && dateValue <= endValue;
   };
 
   // Check if date is in selected range
@@ -76,20 +92,31 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
 
   // Click outside handler
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: PointerEvent) => {
+      if (scheduleModalInfo) return;
+
       if (
         calendarRef.current &&
-        !calendarRef.current.contains(event.target as Node)
+        !calendarRef.current.contains(event.target as Node) &&
+        !schedulesPopoverRef.current?.contains(event.target as Node)
       ) {
         resetSelection();
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        resetSelection();
+      }
     };
-  }, []);
+
+    document.addEventListener('pointerdown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+    return () => {
+      document.removeEventListener('pointerdown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [scheduleModalInfo]);
 
   // Drag gesture handler
   const bind = useDrag(
@@ -247,7 +274,7 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
         </div>
 
         {/* Calendar Grid */}
-        <div className="p-1 sm:p-6 touch-none" ref={calendarRef} {...bind()}>
+        <div className="p-1 sm:p-6 touch-none" {...bind()}>
           {/* Day Headers */}
           <div className="grid grid-cols-7 gap-1 mb-3">
             {dayNames.map((day) => (
@@ -261,7 +288,7 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
           </div>
 
           {/* Calendar Days */}
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-1" ref={calendarRef}>
             {calendarDays.map((date, index) => {
               const isCurrentMonth = date.getMonth() === currentDate.getMonth();
               const isToday = isSameDay(date, new Date());
@@ -285,16 +312,21 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
                   className={`
                     h-full w-full p-1 lg:p-3 min-h-20 rounded-lg text-left transition-all duration-200 relative focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
                     ${
+                      isToday && isCurrentMonth && !isSelected
+                        ? 'bg-blue-200'
+                        : ''
+                    }
+                    ${
                       !isCurrentMonth
                         ? 'text-gray-300 bg-gray-50 hover:bg-gray-100'
-                        : 'text-gray-900 bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300'
+                        : `text-gray-900 bg-white hover:bg-gray-50 border border-gray-200 hover:border-gray-300`
                     }
                     ${
                       isInDragRange && !isSelected
                         ? 'border-blue-200 ring-2 ring-blue-200'
                         : ''
                     }
-                    ${isToday && !isSelected ? 'bg-blue-200' : ''}
+                    
                     ${isSelected ? 'border-blue-500 ring-2 ring-blue-500' : ''}
                     ${isDragging ? 'select-none' : ''}
                   `}
@@ -344,7 +376,22 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
           dayUsers={openPanelInfo.users}
           allDoctors={doctors}
           referenceElement={openPanelInfo.referenceElement}
+          onDoctorClick={(doctor: User) => {
+            setOpenPanelInfo(null);
+            setScheduleModalInfo({ selectedDoctor: doctor });
+          }}
           onClose={() => setOpenPanelInfo(null)}
+          ref={schedulesPopoverRef}
+        />
+      )}
+      {scheduleModalInfo && (
+        <ChangeScheduleModal
+          selectedDates={selectedDates}
+          setSelectedDates={setSelectedDates}
+          doctor={scheduleModalInfo.selectedDoctor}
+          mutateSchedules={mutateSchedules}
+          isOpen={Boolean(scheduleModalInfo)}
+          setIsOpen={() => setScheduleModalInfo(null)}
         />
       )}
     </>
