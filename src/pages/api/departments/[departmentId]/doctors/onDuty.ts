@@ -5,6 +5,7 @@ import { getUserFromRequest } from '@/lib/auth';
 type ReturnData = {
   id: number;
   first_name: string;
+  middle_name: string;
   last_name: string;
   photo_url: string | null;
   specialization: string;
@@ -71,6 +72,7 @@ export default async function handler(
       (doctor: ReturnData) => ({
         id: doctor.id,
         first_name: doctor.first_name,
+        middle_name: doctor.middle_name,
         last_name: doctor.last_name,
         photo_url: doctor.photo_url,
         doctor_data: {
