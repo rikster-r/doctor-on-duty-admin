@@ -7,8 +7,10 @@ import {
   NotePencil,
   Trash,
   DotsSixVertical,
+  CalendarBlankIcon,
 } from '@phosphor-icons/react';
 import { useUser } from '@/hooks/useUser';
+import { useRouter } from 'next/router';
 
 type Props = {
   department: Department;
@@ -25,6 +27,7 @@ export default function SortableDepartmentItem({
 }: Props) {
   const { user } = useUser();
   const [isMobile, setIsMobile] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const checkIsMobile = () =>
@@ -104,19 +107,31 @@ export default function SortableDepartmentItem({
         {user.role === 'head-admin' && (
           <div className="flex gap-3 mt-auto">
             <button
-              className="text-blue-600 hover:text-blue-800 flex items-center gap-1 text-sm"
+              className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
               onClick={() => {
                 setSelectedDepartment(department);
                 setEditDepartmentModalOpen(true);
               }}
+              title="Редактировать данные отделения"
             >
-              <NotePencil size={18} />
+              <NotePencil size={18} weight="bold" />
             </button>
             <button
-              className="text-gray-600 hover:text-gray-700 flex items-center gap-1 text-sm"
-              onClick={openDeleteConfirmModal}
+              aria-label="Редактировать пользователя"
+              className="text-blue-600 hover:text-blue-700 text-center"
+              onClick={() => {
+                router.push(`/schedules?departmentId=${department.id}`);
+              }}
+              title="Открыть графики отделения"
             >
-              <Trash size={18} />
+              <CalendarBlankIcon size={18} weight="bold" />
+            </button>
+            <button
+              className="text-gray-600 hover:text-gray-700 flex items-center gap-1"
+              onClick={openDeleteConfirmModal}
+              title="Удалить отделение"
+            >
+              <Trash size={18} weight="bold" />
             </button>
           </div>
         )}

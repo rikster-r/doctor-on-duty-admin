@@ -20,13 +20,13 @@ export const getServerSideProps = (context: GetServerSidePropsContext) => {
       initialDepartmentId:
         context.query.departmentId === undefined
           ? null
-          : (context.query.departmentId as string),
+          : Number(context.query.departmentId),
     },
   };
 };
 
 type Props = {
-  initialDepartmentId: string | null;
+  initialDepartmentId: number | null;
 };
 
 function Schedules({ initialDepartmentId }: Props) {
@@ -36,7 +36,7 @@ function Schedules({ initialDepartmentId }: Props) {
 
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<
     number | null
-  >(null);
+  >(initialDepartmentId);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {

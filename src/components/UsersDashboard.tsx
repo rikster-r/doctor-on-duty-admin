@@ -212,7 +212,9 @@ export default function UsersDashboard() {
                           aria-label="Редактировать пользователя"
                           className="text-blue-500 hover:text-blue-700 transition-colors duration-150 text-center"
                           onClick={() => {
-                            router.push(`/schedules?doctorId=${user.id}`);
+                            router.push(
+                              `/schedules?departmentId=${user.doctor_data?.department.id}`
+                            );
                           }}
                           title="Открыть страницу графика пользователя"
                         >
