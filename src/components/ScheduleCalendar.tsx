@@ -141,7 +141,7 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
 
           // Open panel for the last selected date
           const lastDate = rangeDates[rangeDates.length - 1];
-          const lastDateStr = lastDate.toISOString().split('T')[0];
+          const lastDateStr = lastDate.toLocaleDateString('en-CA')
           const lastElement = dayElementsRef.current.get(lastDateStr);
 
           if (lastElement) {
@@ -419,7 +419,11 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
         <ChangeScheduleModal
           selectedDates={selectedDates}
           setSelectedDates={setSelectedDates}
-          doctor={scheduleModalInfo.selectedDoctor}
+          selectedDoctor={scheduleModalInfo.selectedDoctor}
+          setSelectedDoctor={(doctor: User) =>
+            setScheduleModalInfo({ selectedDoctor: doctor })
+          }
+          doctors={doctors}
           mutateSchedules={mutateSchedules}
           isOpen={Boolean(scheduleModalInfo)}
           // internally used only for closing

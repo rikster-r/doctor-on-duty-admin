@@ -5,11 +5,14 @@ import { DialogTitle } from '@headlessui/react';
 import { toast } from 'react-toastify';
 import { KeyedMutator } from 'swr';
 import { getDateRange } from '@/lib/dates';
+import DoctorCombobox from '../DoctorCombobox';
 
 type Props = {
   selectedDates: Date[];
   setSelectedDates: React.Dispatch<React.SetStateAction<Date[]>>;
-  doctor: User;
+  selectedDoctor: User;
+  setSelectedDoctor: (doctor: User) => void;
+  doctors: User[];
   mutateSchedules: KeyedMutator<DepartmentDateSchedule[]>;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
@@ -18,7 +21,9 @@ type Props = {
 const ChangeScheduleModal = ({
   selectedDates,
   setSelectedDates,
-  doctor,
+  selectedDoctor,
+  setSelectedDoctor,
+  doctors,
   isOpen,
   setIsOpen,
   mutateSchedules,
@@ -33,7 +38,7 @@ const ChangeScheduleModal = ({
     setIsSubmitting(true);
 
     try {
-      const res = await fetch(`/api/users/${doctor.id}/schedule`, {
+      const res = await fetch(`/api/users/${selectedDoctor.id}/schedule`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -47,7 +52,7 @@ const ChangeScheduleModal = ({
         const data = await res.json();
         throw new Error(data.error);
       }
-      
+
       mutateSchedules();
       handleClose();
     } catch (error) {
@@ -64,7 +69,7 @@ const ChangeScheduleModal = ({
     setIsClearing(true);
 
     try {
-      const res = await fetch(`/api/users/${doctor.id}/schedule`, {
+      const res = await fetch(`/api/users/${selectedDoctor.id}/schedule`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -122,13 +127,21 @@ const ChangeScheduleModal = ({
         </div>
 
         <div className="mb-4">
+          <DoctorCombobox
+            doctors={doctors}
+            selectedDoctorId={selectedDoctor.id}
+            onDoctorChange={setSelectedDoctor}
+          />
+        </div>
+
+        <div className="mb-4">
           <label className="block font-medium mb-1 text-sm text-gray-700">
             {selectedDates.length === 1 ? 'Дата' : 'Даты'}
           </label>
           {selectedDates.length === 1 ? (
             <input
               type="date"
-              value={selectedDates[0].toISOString().split('T')[0]}
+              value={selectedDates[0].toLocaleDateString('en-CA')}
               onChange={(e) => setSelectedDates([new Date(e.target.value)])}
               className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-sm"
               required
