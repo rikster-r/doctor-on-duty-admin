@@ -12,7 +12,8 @@ type Props = {
   mutateSchedules: KeyedMutator<DepartmentDateSchedule[]>;
   holidays: Holiday[];
   mutateHolidays: KeyedMutator<Holiday[]>;
-  isLoading: boolean;
+  isPageLoading: boolean;
+  isCalendarLoading: boolean;
   selectedDate: Date;
   setSelectedDate: React.Dispatch<React.SetStateAction<Date>>;
 };
@@ -26,7 +27,8 @@ const ScheduleControlPage = ({
   mutateSchedules,
   holidays,
   mutateHolidays,
-  isLoading,
+  isPageLoading,
+  isCalendarLoading,
   selectedDate,
   setSelectedDate,
 }: Props) => {
@@ -47,32 +49,24 @@ const ScheduleControlPage = ({
             departments={departments}
             selectedDepartmentId={selectedDepartmentId}
             onDepartmentChange={setSelectedDepartmentId}
-            isLoading={isLoading}
+            isLoading={isPageLoading}
             placeholder="Загрузка..."
           />
         </div>
 
-        {isLoading && (
-          <div className="bg-white rounded-lg shadow-md overflow-hidden p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-500">Загрузка...</p>
-          </div>
-        )}
-
-        {!isLoading && (
-          <div className="space-y-6">
-            <ScheduleCalendar
-              doctors={doctors}
-              selectedDepartmentId={selectedDepartmentId}
-              schedules={schedules}
-              mutateSchedules={mutateSchedules}
-              holidays={holidays}
-              mutateHolidays={mutateHolidays}
-              currentDate={selectedDate}
-              setCurrentDate={setSelectedDate}
-            />
-          </div>
-        )}
+        <div className="space-y-6">
+          <ScheduleCalendar
+            doctors={doctors}
+            selectedDepartmentId={selectedDepartmentId}
+            schedules={schedules}
+            mutateSchedules={mutateSchedules}
+            holidays={holidays}
+            mutateHolidays={mutateHolidays}
+            currentDate={selectedDate}
+            setCurrentDate={setSelectedDate}
+            isCalendarLoading={isCalendarLoading}
+          />
+        </div>
       </main>
     </Layout>
   );

@@ -26,6 +26,7 @@ type Props = {
   mutateHolidays: KeyedMutator<Holiday[]>;
   currentDate: Date;
   setCurrentDate: React.Dispatch<React.SetStateAction<Date>>;
+  isCalendarLoading: boolean;
 };
 
 const DepartmentScheduleCalendar: React.FC<Props> = ({
@@ -37,6 +38,7 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
   mutateHolidays,
   currentDate,
   setCurrentDate,
+  isCalendarLoading,
 }) => {
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [openPanelInfo, setOpenPanelInfo] = useState<{
@@ -141,7 +143,7 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
 
           // Open panel for the last selected date
           const lastDate = rangeDates[rangeDates.length - 1];
-          const lastDateStr = lastDate.toLocaleDateString('en-CA')
+          const lastDateStr = lastDate.toLocaleDateString('en-CA');
           const lastElement = dayElementsRef.current.get(lastDateStr);
 
           if (lastElement) {
@@ -290,60 +292,68 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
         </div>
 
         {/* Calendar Grid */}
-        <div className="p-1 sm:p-6 touch-none" {...bind()}>
-          {/* Day Headers */}
-          <div className="grid grid-cols-7 gap-1 mb-3">
-            {dayNames.map((day) => (
-              <div
-                key={day}
-                className={`${
-                  day === 'Сб' || day === 'Вс'
-                    ? 'text-amber-700'
-                    : 'text-gray-500'
-                } p-1 text-center text-sm font-medium`}
-              >
-                {day}
-              </div>
-            ))}
+        {isCalendarLoading && (
+          <div className="bg-white rounded-lg shadow-md overflow-hidden p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-500">Загрузка...</p>
           </div>
+        )}
+        {!isCalendarLoading && (
+          <div className="p-1 sm:p-6 touch-none" {...bind()}>
+            {/* Day Headers */}
+            <div className="grid grid-cols-7 gap-1 mb-3">
+              {dayNames.map((day) => (
+                <div
+                  key={day}
+                  className={`${
+                    day === 'Сб' || day === 'Вс'
+                      ? 'text-amber-700'
+                      : 'text-gray-500'
+                  } p-1 text-center text-sm font-medium`}
+                >
+                  {day}
+                </div>
+              ))}
+            </div>
 
-          {/* Calendar Days */}
-          <div className="grid grid-cols-7 gap-1" ref={calendarRef}>
-            {calendarDays.map((date, index) => {
-              const isCurrentMonth = date.getMonth() === currentDate.getMonth();
-              const dayUsers = getScheduleForDate(date);
-              const hasUsers = dayUsers.length > 0;
-              const dateStr = date.toLocaleDateString('en-CA');
-              const isSelected = isDateInSelectedRange(date);
-              const isInDragRange = isDateInDragRange(date);
-              const isHoliday = holidays.some((day) => day.date === dateStr);
-              const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-              let bgClass = '';
-              if (isHoliday) {
-                bgClass =
-                  'bg-emerald-100 text-emerald-800 font-semibold hover:bg-emerald-200 border border-emerald-200';
-              } else if (!isCurrentMonth) {
-                bgClass = 'bg-gray-50 text-gray-300';
-              } else if (isWeekend) {
-                bgClass =
-                  'bg-amber-50 text-amber-700 font-medium hover:bg-amber-100';
-              } else {
-                bgClass =
-                  'bg-white text-gray-700 hover:bg-gray-50 border border-gray-100';
-              }
+            {/* Calendar Days */}
+            <div className="grid grid-cols-7 gap-1" ref={calendarRef}>
+              {calendarDays.map((date, index) => {
+                const isCurrentMonth =
+                  date.getMonth() === currentDate.getMonth();
+                const dayUsers = getScheduleForDate(date);
+                const hasUsers = dayUsers.length > 0;
+                const dateStr = date.toLocaleDateString('en-CA');
+                const isSelected = isDateInSelectedRange(date);
+                const isInDragRange = isDateInDragRange(date);
+                const isHoliday = holidays.some((day) => day.date === dateStr);
+                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                let bgClass = '';
+                if (isHoliday) {
+                  bgClass =
+                    'bg-emerald-100 text-emerald-800 font-semibold hover:bg-emerald-200 border border-emerald-200';
+                } else if (!isCurrentMonth) {
+                  bgClass = 'bg-gray-50 text-gray-300';
+                } else if (isWeekend) {
+                  bgClass =
+                    'bg-amber-50 text-amber-700 font-medium hover:bg-amber-100';
+                } else {
+                  bgClass =
+                    'bg-white text-gray-700 hover:bg-gray-50 border border-gray-100';
+                }
 
-              return (
-                <button
-                  key={index}
-                  ref={(el) => {
-                    if (el) {
-                      dayElementsRef.current.set(dateStr, el);
-                    } else {
-                      dayElementsRef.current.delete(dateStr);
-                    }
-                  }}
-                  data-date={dateStr}
-                  className={`
+                return (
+                  <button
+                    key={index}
+                    ref={(el) => {
+                      if (el) {
+                        dayElementsRef.current.set(dateStr, el);
+                      } else {
+                        dayElementsRef.current.delete(dateStr);
+                      }
+                    }}
+                    data-date={dateStr}
+                    className={`
                     h-full w-full p-1 lg:p-3 min-h-20 rounded-lg text-left transition-all duration-200 relative focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
                     ${bgClass}
                     ${
@@ -359,45 +369,46 @@ const DepartmentScheduleCalendar: React.FC<Props> = ({
                     ${isSelected ? 'border-blue-500 ring-2 ring-blue-500' : ''}
                     ${isDragging ? 'select-none' : ''}
                   `}
-                  onClick={(e) =>
-                    handleDayClick(e.currentTarget, date, dayUsers)
-                  }
-                  style={{
-                    userSelect: isDragging ? 'none' : 'auto',
-                    touchAction: 'none', // Prevent scrolling during drag
-                  }}
-                >
-                  <div className="font-medium text-sm mb-auto">
-                    {date.getDate()}
-                  </div>
+                    onClick={(e) =>
+                      handleDayClick(e.currentTarget, date, dayUsers)
+                    }
+                    style={{
+                      userSelect: isDragging ? 'none' : 'auto',
+                      touchAction: 'none', // Prevent scrolling during drag
+                    }}
+                  >
+                    <div className="font-medium text-sm mb-auto">
+                      {date.getDate()}
+                    </div>
 
-                  <div className="text-xs space-y-1 min-h-[48px] sm:min-h-[20px]">
-                    {hasUsers && (
-                      <div className="space-y-1">
-                        {/* Working doctors */}
-                        {dayUsers.map((user) => (
-                          <div key={user.id}>
-                            {user.schedule && (
-                              <div className="flex items-center space-x-2 bg-blue-50 border border-blue-200 py-0.5 px-1 sm:px-2 rounded-md">
-                                <span className="font-semibold text-blue-800 truncate">
-                                  {user.last_name} {user.first_name.slice(0, 1)}
-                                  .
-                                  {user.middle_name
-                                    ? `${user.middle_name.slice(0, 1)}.`
-                                    : ''}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </button>
-              );
-            })}
+                    <div className="text-xs space-y-1 min-h-[48px] sm:min-h-[20px]">
+                      {hasUsers && (
+                        <div className="space-y-1">
+                          {/* Working doctors */}
+                          {dayUsers.map((user) => (
+                            <div key={user.id}>
+                              {user.schedule && (
+                                <div className="flex items-center space-x-2 bg-blue-50 border border-blue-200 py-0.5 px-1 sm:px-2 rounded-md">
+                                  <span className="font-semibold text-blue-800 truncate">
+                                    {user.last_name}{' '}
+                                    {user.first_name.slice(0, 1)}.
+                                    {user.middle_name
+                                      ? `${user.middle_name.slice(0, 1)}.`
+                                      : ''}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
       </div>
       {openPanelInfo && (
         <SchedulePopoverPanel

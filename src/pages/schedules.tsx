@@ -80,11 +80,8 @@ function Schedules({ initialDepartmentId }: Props) {
     fetcher
   );
 
-  const isLoading =
-    isSchedulesLoading ||
-    isDepartmentsLoading ||
-    isDoctorsLoading ||
-    isHolidaysLoading;
+  const isPageLoading = isDepartmentsLoading || isDoctorsLoading;
+  const isCalendarLoading = isSchedulesLoading || isHolidaysLoading;
 
   return (
     <SchedulesDashboard
@@ -98,7 +95,8 @@ function Schedules({ initialDepartmentId }: Props) {
       mutateSchedules={mutateSchedules}
       holidays={holidays ?? []}
       mutateHolidays={mutateHolidays}
-      isLoading={isLoading}
+      isPageLoading={isPageLoading}
+      isCalendarLoading={isCalendarLoading}
     />
   );
 }
