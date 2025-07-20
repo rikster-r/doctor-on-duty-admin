@@ -15,10 +15,6 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const supabase = createClient(req, res);
-  const authenticated = isUserAuthenticated(req);
-  if (!authenticated) {
-    return res.status(401).json({ error: 'Нет доступа' });
-  }
 
   const { departmentId } = req.query;
 
@@ -27,6 +23,10 @@ export default async function handler(
   }
 
   if (req.method === 'PUT') {
+    const authenticated = isUserAuthenticated(req);
+    if (!authenticated) {
+      return res.status(401).json({ error: 'Нет доступа' });
+    }
     const form = formidable({ multiples: true });
 
     try {
@@ -97,6 +97,10 @@ export default async function handler(
       return res.status(500).json({ error: 'Внутренняя ошибка сервера' });
     }
   } else if (req.method === 'DELETE') {
+    const authenticated = isUserAuthenticated(req);
+    if (!authenticated) {
+      return res.status(401).json({ error: 'Нет доступа' });
+    }
     try {
       const { data, error } = await supabase
         .from('departments')
@@ -113,6 +117,23 @@ export default async function handler(
     } catch (error) {
       console.error(error);
       return res.status(500).json({ error: 'Ошибка при удалении отдела' });
+    }
+  } else if (req.method === 'GET') {
+    try {
+      const { data, error } = await supabase
+        .from('departments')
+        .select()
+        .eq('id', departmentId)
+        .single();
+
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
+
+      return res.status(200).json(data);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Ошибка при получении отдела' });
     }
   }
 }
