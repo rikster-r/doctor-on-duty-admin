@@ -19,14 +19,19 @@ const EditDepartmentModal = ({
   department,
   mutateDepartments,
 }: Props) => {
+  console.log(department)
   const [name, setName] = useState(department.name);
+  const [phoneNumber, setPhoneNumber] = useState(department.phone_number || '');
   const [file, setFile] = useState<File | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     const formData = new FormData();
     formData.append('name', name);
+    if (phoneNumber) {
+      formData.append('phone_number', phoneNumber);
+    }
     if (file) {
       formData.append('icon', file);
     }
@@ -79,6 +84,24 @@ const EditDepartmentModal = ({
           />
         </div>
 
+        <div className="mb-4 group">
+          <label
+            htmlFor="phoneNumber"
+            className="block font-medium mb-1 text-sm text-gray-700"
+          >
+            Номер телефона
+          </label>
+          <input
+            type="tel"
+            id="phoneNumber"
+            name="phoneNumber"
+            placeholder="+7 (xxx) xxx-xx-xx"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            className="peer w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-sm"
+          />
+        </div>
+
         <div className="mb-4">
           <label
             htmlFor="icon"
@@ -88,7 +111,7 @@ const EditDepartmentModal = ({
           </label>
           <RowFileInput name="icon" file={file} setFile={setFile} />
           <p className="mt-1 text-sm text-gray-500">
-            SVG, PNG или JPG(макс. 500x500px)
+            SVG, PNG или JPG (макс. 500x500px)
           </p>
         </div>
 

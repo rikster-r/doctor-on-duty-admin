@@ -19,14 +19,18 @@ const AddDepartmentModal = ({
 }: Props) => {
   const [name, setName] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
     const formData = new FormData();
     formData.append('name', name);
     if (file) {
       formData.append('icon', file);
+    }
+    if (phoneNumber) {
+      formData.append('phone_number', phoneNumber);
     }
 
     const res = await fetch('/api/departments', {
@@ -38,6 +42,10 @@ const AddDepartmentModal = ({
       toast.success('Отделение успешно добавлено');
       mutateDepartments();
       setIsOpen(false);
+      // Reset form
+      setName('');
+      setFile(null);
+      setPhoneNumber('');
     } else {
       const data = await res.json();
       toast.error(data.error || 'Ошибка при добавлении');
@@ -73,6 +81,24 @@ const AddDepartmentModal = ({
             placeholder="Введите название"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            className="peer w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-sm"
+          />
+        </div>
+
+        <div className="mb-4 group">
+          <label
+            htmlFor="phoneNumber"
+            className="block font-medium mb-1 text-sm text-gray-700"
+          >
+            Номер телефона
+          </label>
+          <input
+            type="tel"
+            id="phoneNumber"
+            name="phoneNumber"
+            placeholder="+7 (xxx) xxx-xx-xx"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
             className="peer w-full px-4 py-3 rounded-xl border border-gray-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 text-sm"
           />
         </div>

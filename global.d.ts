@@ -24,6 +24,7 @@ type UsersPanelData = {
 type Department = {
   id: number;
   name: string;
+  phone_number: string;
   photo_url: string;
   order: number;
   created_at: string;

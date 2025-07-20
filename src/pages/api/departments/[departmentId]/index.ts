@@ -33,9 +33,11 @@ export default async function handler(
       const {
         icon,
         name,
+        phone_number,
       }: {
         icon: formidable.File | null;
         name: string | null;
+        phone_number: string | null;
       } = await new Promise(function (resolve, reject) {
         form.parse(req, (err, fields, files) => {
           if (err) {
@@ -48,6 +50,9 @@ export default async function handler(
             name: Array.isArray(fields.name)
               ? fields.name[0]
               : fields.name ?? null,
+            phone_number: Array.isArray(fields.phone_number)
+              ? fields.phone_number[0]
+              : fields.phone_number ?? null,
           });
         });
       });
@@ -65,6 +70,10 @@ export default async function handler(
           public_id: icon.newFilename,
         });
         updates.photo_url = imageData.secure_url;
+      }
+
+      if (phone_number) {
+        updates.phone_number = phone_number;
       }
 
       if (Object.keys(updates).length === 0) {
